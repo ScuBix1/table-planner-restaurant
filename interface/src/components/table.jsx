@@ -1,8 +1,10 @@
 import React from 'react'
+import { useReservation } from '../contexts/reservation'
 
-export const Table = ({ className }) => {
+export const Table = ({ className, id, onClick}) => {
+    
     return (
-        <div className={`cursor-pointer ${className ? className : ''}`}>
+        <div className={`cursor-pointer ${className ? className : ''}`} id={id?id:''} onClick={onClick?onClick:''}>
             <div className={`w-12 h-14 relative origin-center rotate-90`}>
                 <div className={`w-12 h-4 rounded-full bg-gray-400 absolute z-0 top-2`}></div>
                 <div

@@ -3,22 +3,40 @@ import { Table } from '../components/table'
 import { GrandSalon, PetitSalon } from '../components/salon'
 import Logo from '../assets/img/logo.png'
 import { ModalDefault } from '../components/modal'
+import { ValidationButton } from '../components/button'
+import { useReservation } from '../contexts/reservation'
+
 export const Home = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-    const [modalState, setModalState] = useState('open')
-
+    const {setIdTableSelected, idTableSelected, setModalState, modalState} = useReservation()
+    
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth)
         }
-
         window.addEventListener('resize', handleResize)
-
-        // Nettoyez l'écouteur lorsque le composant est démonté
         return () => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
+    useEffect(()=>{
+        setIdTableSelected(idTableSelected)
+        console.log(idTableSelected)
+    },[idTableSelected])
+    const renderTables = (count, idNumber) => {
+        const tables = [];
+        for (let i = 0; i < count; i++) {
+          tables.push(<Table key={i} id={idNumber + i} onClick={(id)=>{setIdTableSelected(idNumber + i); setModalState('open')}}/>);
+        }
+        return tables;
+      };
+      const renderPetitsSalons = (count, idNumber) => {
+        const petitsSalons = [];
+        for (let i = 0; i < count; i++) {
+          petitsSalons.push(<PetitSalon key={i} id={idNumber + i} onClick={(id)=>{setIdTableSelected(idNumber + i); setModalState('open')}}/>);
+        }
+        return petitsSalons;
+      };
     return (
         <>
             {windowWidth > 800 ? (
@@ -36,35 +54,20 @@ export const Home = () => {
             <h2 className="text-center">Réservez votre table pour l'événement</h2>
             <div className="h-[80vh] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto ">
                 <div className="absolute bottom-0 left-4">
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
+                {renderTables(9, 100)}
                 </div>
                 <div className="absolute bottom-0 left-[30vw]">
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
-                    <Table />
+                {renderTables(6, 200)}
                 </div>
-                <Table className="absolute right-1 lg:right-4 lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem] origin-center rotate-[-90deg]" />
-                <Table className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]" />
-                <div className="absolute bottom-0 right-0 w-[50vw] md:w-[28vw] h-[45vh]">
+                <Table className="absolute right-1 lg:right-4 lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem] origin-center rotate-[-90deg]" id="300" onClick={()=>{setIdTableSelected(300); setModalState('open')}}/>
+                <Table className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]" id="400" onClick={()=>{setIdTableSelected(400); setModalState('open')}}/>
+                <div className="absolute bottom-0 right-0 w-[50vw] md:w-[28vw] h-[30vh]">
                     <div className="absolute left-0 bottom-32">
-                        <PetitSalon />
-                        <PetitSalon />
+                    {renderPetitsSalons(2,500)}
                     </div>
-                    <GrandSalon className="absolute bottom-0 right-0 flex justify-center items-center" />
+                    <GrandSalon className="absolute bottom-0 right-0 flex justify-center items-center" id="502" onClick={()=>{setIdTableSelected(502); setModalState('open')}}/>
                     <div className="absolute right-0 bottom-32">
-                        <PetitSalon />
-                        <PetitSalon />
+                        {renderPetitsSalons(2,503)}
                     </div>
                 </div>
             </div>
@@ -72,7 +75,7 @@ export const Home = () => {
                 title="Réservation de table"
                 isOpen={modalState === 'open'}
                 setIsOpen={() => setModalState('')}
-                confirmButton={<button className='flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-gray-800 font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-xl hover:shadow-red-500 hover:scale-105 duration-300 hover:from-[#be123c] hover:to-[#fb7185] mb-6'>Payer</button>}
+                confirmButton={<ValidationButton textButton={'Payer'}/>}
             >
                 <form action="">
                     <div>
