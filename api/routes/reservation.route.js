@@ -9,11 +9,13 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { tableNumber, customerName, startTime, endTime, price, statusTable } = req.body;
+        const { tableNumber, customerName, email, phoneNumber, startTime, endTime, price, statusTable } = req.body;
 
         const newReservation = new Reservation({
             tableNumber,
             customerName,
+            email,
+            phoneNumber,
             startTime: new Date(startTime),
             endTime: new Date(endTime),
             price,
