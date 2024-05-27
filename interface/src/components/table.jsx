@@ -2,7 +2,7 @@ import React from 'react'
 
 export const Table = ({ className }) => {
     return (
-        <div className={`${className ? className : ''}`}>
+        <div className={`cursor-pointer ${className ? className : ''}`}>
             <div className={`w-12 h-14 relative origin-center rotate-90`}>
                 <div className={`w-12 h-4 rounded-full bg-gray-400 absolute z-0 top-2`}></div>
                 <div
