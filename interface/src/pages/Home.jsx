@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Table } from '../components/table'
-import { GrandSalon, PetitSalon } from '../components/salon'
+import { Table, TableReserved } from '../components/table'
+import { GrandSalon, GrandSalonReserved, PetitSalon, PetitSalonReserved } from '../components/salon'
 import Logo from '../assets/img/logo.png'
 import { ModalDefault } from '../components/modal'
 import { ValidationButton } from '../components/button'
@@ -8,8 +8,8 @@ import { useReservation } from '../contexts/reservation'
 
 export const Home = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-    const {setIdTableSelected, idTableSelected, setModalState, modalState} = useReservation()
-    
+    const { setIdTableSelected, idTableSelected, setModalState, modalState, tables, getAllTables } = useReservation()
+
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth)
@@ -19,24 +19,73 @@ export const Home = () => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
-    useEffect(()=>{
+    useEffect(() => {
         setIdTableSelected(idTableSelected)
-        console.log(idTableSelected)
-    },[idTableSelected])
-    const renderTables = (count, idNumber) => {
-        const tables = [];
-        for (let i = 0; i < count; i++) {
-          tables.push(<Table key={i} id={idNumber + i} onClick={(id)=>{setIdTableSelected(idNumber + i); setModalState('open')}}/>);
+        getAllTables()
+        console.log(tables)
+    }, [idTableSelected, modalState])
+    const renderTables = (initCount, count, idNumber) => {
+        const tablesTab = []
+        for (let i = initCount; i < initCount + count; i++) {
+            console.log(tables[i]?.statusTable)
+            if (tables[i]?.numberTable == idNumber && tables[i]?.statusTable === 'reserved') {
+                tablesTab.push(
+                    <TableReserved
+                        key={'table-' + i}
+                        id={idNumber + i}
+                        onClick={() => {
+                            setIdTableSelected(idNumber + i)
+                            setModalState('')
+                        }}
+                    />
+                )
+            } else {
+                tablesTab.push(
+                    <Table
+                        key={'table-' + i}
+                        id={idNumber + i}
+                        onClick={() => {
+                            setIdTableSelected(idNumber + i)
+                            setModalState('open')
+                        }}
+                    />
+                )
+            }
+            idNumber++
         }
-        return tables;
-      };
-      const renderPetitsSalons = (count, idNumber) => {
-        const petitsSalons = [];
-        for (let i = 0; i < count; i++) {
-          petitsSalons.push(<PetitSalon key={i} id={idNumber + i} onClick={(id)=>{setIdTableSelected(idNumber + i); setModalState('open')}}/>);
+        return tablesTab
+    }
+    const renderPetitsSalons = (initCount, count, idNumber) => {
+        const petitsSalons = []
+        for (let i = initCount; i < initCount + count; i++) {
+            if (tables[i]?.numberTable === idNumber && tables[i]?.statusTable === 'reserved') {
+                petitsSalons.push(
+                    <PetitSalonReserved
+                        key={i}
+                        id={idNumber + i}
+                        onClick={() => {
+                            setIdTableSelected(idNumber + i)
+                            setModalState('')
+                        }}
+                    />
+                )
+            }else{
+                petitsSalons.push(
+                    <PetitSalon
+                        key={i}
+                        id={idNumber + i}
+                        onClick={() => {
+                            setIdTableSelected(idNumber + i)
+                            setModalState('open')
+                        }}
+                    />
+                )
+            }
+            idNumber++
         }
-        return petitsSalons;
-      };
+        return petitsSalons
+    }
+    console.log(tables[20])
     return (
         <>
             {windowWidth > 800 ? (
@@ -53,29 +102,71 @@ export const Home = () => {
             )}
             <h2 className="text-center">Réservez votre table pour l'événement</h2>
             <div className="h-[80vh] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto ">
-                <div className="absolute bottom-0 left-4">
-                {renderTables(9, 100)}
-                </div>
-                <div className="absolute bottom-0 left-[30vw]">
-                {renderTables(6, 200)}
-                </div>
-                <Table className="absolute right-1 lg:right-4 lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem] origin-center rotate-[-90deg]" id="300" onClick={()=>{setIdTableSelected(300); setModalState('open')}}/>
-                <Table className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]" id="400" onClick={()=>{setIdTableSelected(400); setModalState('open')}}/>
+                <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>
+                <div className="absolute bottom-0 left-[30vw]">{renderTables(9, 6, 200)}</div>
+                {tables[15]?.numberTable === 300 && tables[15]?.statusTable === 'free' ? (
+                    <Table
+                        className="absolute right-1 lg:right-4 lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem] origin-center rotate-[-90deg]"
+                        id="300"
+                        onClick={() => {
+                            setIdTableSelected(300)
+                            setModalState('open')
+                        }}
+                    />
+                ) : (
+                    <TableReserved
+                        className="absolute right-1 lg:right-4 lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem] origin-center rotate-[-90deg]"
+                        id="300"
+                        onClick={() => {
+                            setIdTableSelected(300)
+                            setModalState('')
+                        }}
+                    />
+                )}
+                {tables[16]?.numberTable === 400 && tables[16]?.statusTable === 'free' ? (
+                    <Table
+                        className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]"
+                        id="300"
+                        onClick={() => {
+                            setIdTableSelected(400)
+                            setModalState('open')
+                        }}
+                    />
+                ) : (
+                    <TableReserved
+                        className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]"
+                        id="300"
+                        onClick={() => {
+                            setIdTableSelected(400)
+                            setModalState('')
+                        }}
+                    />
+                )}
                 <div className="absolute bottom-0 right-0 w-[50vw] md:w-[28vw] h-[30vh]">
-                    <div className="absolute left-0 bottom-32">
-                    {renderPetitsSalons(2,500)}
-                    </div>
-                    <GrandSalon className="absolute bottom-0 right-0 flex justify-center items-center" id="502" onClick={()=>{setIdTableSelected(502); setModalState('open')}}/>
-                    <div className="absolute right-0 bottom-32">
-                        {renderPetitsSalons(2,503)}
-                    </div>
+                    <div className="absolute left-0 bottom-32">{renderPetitsSalons(17, 2, 500)}</div>
+                    {tables[19]?.numberTable === 502 && tables[19]?.statusTable === 'free' ?(<GrandSalon
+                        className="absolute bottom-0 right-0 flex justify-center items-center"
+                        id="502"
+                        onClick={() => {
+                            setIdTableSelected(502)
+                            setModalState('open')
+                        }}
+                    />):(<GrandSalonReserved
+                        className="absolute bottom-0 right-0 flex justify-center items-center"
+                        id="502"
+                        onClick={() => {
+                            setIdTableSelected(502)
+                            setModalState('')
+                        }}
+                    />)}
+                    <div className="absolute right-0 bottom-32">{renderPetitsSalons(20, 2, 503)}</div>
                 </div>
             </div>
             <ModalDefault
                 title="Réservation de table"
                 isOpen={modalState === 'open'}
                 setIsOpen={() => setModalState('')}
-                confirmButton={<ValidationButton textButton={'Payer'}/>}
+                confirmButton={<ValidationButton textButton={'Payer'} />}
             >
                 <form action="">
                     <div>
@@ -135,8 +226,14 @@ export const Home = () => {
                         />
                     </div>
                     <div>
-                        <label htmlFor="timeReservation" className="block mb-2 text-sm font-medium"> Heure de réservation: </label>
-                        <select id="time" className="bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <label htmlFor="timeReservation" className="block mb-2 text-sm font-medium">
+                            {' '}
+                            Heure de réservation:{' '}
+                        </label>
+                        <select
+                            id="time"
+                            className="bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
                             <option value={{ startTime: '2024-05-27T12:00:00Z', endTime: '2024-05-27T15:00:00Z' }}>
                                 Après-midi
                             </option>
