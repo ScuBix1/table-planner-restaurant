@@ -8,7 +8,7 @@ const ReservationContext = createContext({
     setIdTableSelected: ()=>{},
     getAllTables: async ()=>{
         return Promise.resolve()
-    },
+    }
 })
 
 export function ReservationContextProvider({children}){

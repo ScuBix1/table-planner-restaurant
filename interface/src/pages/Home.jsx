@@ -3,13 +3,119 @@ import { Table, TableReserved } from '../components/table'
 import { GrandSalon, GrandSalonReserved, PetitSalon, PetitSalonReserved } from '../components/salon'
 import Logo from '../assets/img/logo.png'
 import { ModalDefault } from '../components/modal'
-import { ValidationButton } from '../components/button'
+import { ValidationButton, ValidationSubmitButton } from '../components/button'
 import { useReservation } from '../contexts/reservation'
+import axios from 'axios'
 
 export const Home = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const { setIdTableSelected, idTableSelected, setModalState, modalState, tables, getAllTables } = useReservation()
+    const [reservationData, setReservationData] = useState({
+        name: '',
+        email: '',
+        phoneNumber: '',
+        timeReservation: '2024-06-16T16:00:00Z/2024-06-16T23:00:00Z',
+        termsAccepted: false,
+        menu: '',
+    })
+    const [errorMessage, setErrorMessage] = useState('');
+    //fonction de requete pour le formulaire
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        try{
+            await axios.post('http://localhost:3003/api/reservation', 
+                {
+                    tableNumber: idTableSelected,
+                    customerName: reservationData.name,
+                    email: reservationData.email,
+                    phoneNumber: reservationData.phoneNumber,
+                    timeReservation: reservationData.timeReservation,
+                    termsAccepted: reservationData.termsAccepted,
+                }
+            );
+            await axios.put('http://localhost:3003/api/table', {
+                price: 1,
+                statusTable: 'reserved',
+                typeMenus: reservationData.menu,
+            })
+        }catch(error){
+            if (error.response && error.response.data && error.response.data.message) {
+                setErrorMessage(error.response.data.message);
+              } else {
+                setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
+              }
+        }
+    }
+    //fonction pour obtenir le menu choisi
+    const handleRadioChange = (e) => {
+        setReservationData((prevState) => ({
+            ...prevState,
+            menu: e.target.value,
+        }))
+    }
+    //création des petites tables du restaurant
+    const renderTables = (initCount, count, idNumber) => {
+        const tablesTab = []
+        for (let i = initCount; i < initCount + count; i++) {
+            if (tables[i]?.numberTable == idNumber && tables[i]?.statusTable === 'reserved') {
+                tablesTab.push(
+                    <TableReserved
+                        key={'table-' +  i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('')
+                        }}
+                    />
+                )
+            } else {
+                tablesTab.push(
+                    <Table
+                        key={'table-' + i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('menu')
+                        }}
+                    />
+                )
+            }
+            idNumber++
+        }
+        return tablesTab
+    }
+    //création des petits salons du restaurant
+    const renderPetitsSalons = (initCount, count, idNumber) => {
+        const petitsSalons = []
+        for (let i = initCount; i < initCount + count; i++) {
+            if (tables[i]?.numberTable === idNumber && tables[i]?.statusTable === 'reserved') {
+                petitsSalons.push(
+                    <PetitSalonReserved
+                        key={ i}
+                        id={idNumber }
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('')
+                        }}
+                    />
+                )
+            } else {
+                petitsSalons.push(
+                    <PetitSalon
+                        key={ i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('menu')
+                        }}
+                    />
+                )
+            }
+            idNumber++
+        }
 
+        return petitsSalons
+    } //useEffect de redimensionnement de la fenetre
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth)
@@ -19,73 +125,11 @@ export const Home = () => {
             window.removeEventListener('resize', handleResize)
         }
     }, [])
+    //useEffect pour accéder aux tables réservées
     useEffect(() => {
         setIdTableSelected(idTableSelected)
         getAllTables()
-        console.log(tables)
     }, [idTableSelected, modalState])
-    const renderTables = (initCount, count, idNumber) => {
-        const tablesTab = []
-        for (let i = initCount; i < initCount + count; i++) {
-            console.log(tables[i]?.statusTable)
-            if (tables[i]?.numberTable == idNumber && tables[i]?.statusTable === 'reserved') {
-                tablesTab.push(
-                    <TableReserved
-                        key={'table-' + i}
-                        id={idNumber + i}
-                        onClick={() => {
-                            setIdTableSelected(idNumber + i)
-                            setModalState('')
-                        }}
-                    />
-                )
-            } else {
-                tablesTab.push(
-                    <Table
-                        key={'table-' + i}
-                        id={idNumber + i}
-                        onClick={() => {
-                            setIdTableSelected(idNumber + i)
-                            setModalState('open')
-                        }}
-                    />
-                )
-            }
-            idNumber++
-        }
-        return tablesTab
-    }
-    const renderPetitsSalons = (initCount, count, idNumber) => {
-        const petitsSalons = []
-        for (let i = initCount; i < initCount + count; i++) {
-            if (tables[i]?.numberTable === idNumber && tables[i]?.statusTable === 'reserved') {
-                petitsSalons.push(
-                    <PetitSalonReserved
-                        key={i}
-                        id={idNumber + i}
-                        onClick={() => {
-                            setIdTableSelected(idNumber + i)
-                            setModalState('')
-                        }}
-                    />
-                )
-            }else{
-                petitsSalons.push(
-                    <PetitSalon
-                        key={i}
-                        id={idNumber + i}
-                        onClick={() => {
-                            setIdTableSelected(idNumber + i)
-                            setModalState('open')
-                        }}
-                    />
-                )
-            }
-            idNumber++
-        }
-        return petitsSalons
-    }
-    console.log(tables[20])
     return (
         <>
             {windowWidth > 800 ? (
@@ -110,7 +154,7 @@ export const Home = () => {
                         id="300"
                         onClick={() => {
                             setIdTableSelected(300)
-                            setModalState('open')
+                            setModalState('menu')
                         }}
                     />
                 ) : (
@@ -129,7 +173,7 @@ export const Home = () => {
                         id="300"
                         onClick={() => {
                             setIdTableSelected(400)
-                            setModalState('open')
+                            setModalState('menu')
                         }}
                     />
                 ) : (
@@ -144,31 +188,77 @@ export const Home = () => {
                 )}
                 <div className="absolute bottom-0 right-0 w-[50vw] md:w-[28vw] h-[30vh]">
                     <div className="absolute left-0 bottom-32">{renderPetitsSalons(17, 2, 500)}</div>
-                    {tables[19]?.numberTable === 502 && tables[19]?.statusTable === 'free' ?(<GrandSalon
-                        className="absolute bottom-0 right-0 flex justify-center items-center"
-                        id="502"
-                        onClick={() => {
-                            setIdTableSelected(502)
-                            setModalState('open')
-                        }}
-                    />):(<GrandSalonReserved
-                        className="absolute bottom-0 right-0 flex justify-center items-center"
-                        id="502"
-                        onClick={() => {
-                            setIdTableSelected(502)
-                            setModalState('')
-                        }}
-                    />)}
+                    {tables[19]?.numberTable === 502 && tables[19]?.statusTable === 'free' ? (
+                        <GrandSalon
+                            className="absolute bottom-0 right-0 flex justify-center items-center"
+                            id="502"
+                            onClick={() => {
+                                setIdTableSelected(502)
+                                setModalState('menu')
+                            }}
+                        />
+                    ) : (
+                        <GrandSalonReserved
+                            className="absolute bottom-0 right-0 flex justify-center items-center"
+                            id="502"
+                            onClick={() => {
+                                setIdTableSelected(502)
+                                setModalState('')
+                            }}
+                        />
+                    )}
                     <div className="absolute right-0 bottom-32">{renderPetitsSalons(20, 2, 503)}</div>
                 </div>
             </div>
             <ModalDefault
+                title="Choix du menu"
+                isOpen={modalState === 'menu'}
+                setIsOpen={() => setModalState('')}
+                confirmButton={<ValidationButton textButton={'Continuer'} onClick={() => setModalState('open')} />}
+            >
+                <form className="md:flex grid" method="post">
+                    <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                        <p>Entrée</p>
+                        <span>+</span>
+                        <p>Plat et boisson</p>
+                        <span>+</span>
+                        <p>Dessert</p>
+                        <input
+                            type="radio"
+                            className="menu"
+                            name="menu"
+                            value="2"
+                            checked={reservationData.menu === '2'}
+                            onChange={handleRadioChange}
+                        />
+                    </div>
+                    <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                        <p>Entrée</p>
+                        <span>+</span>
+                        <p>Plat et boisson</p>
+                        <span>+</span>
+                        <p>Dessert</p>
+                        <input
+                            type="radio"
+                            className="menu"
+                            name="menu"
+                            value="4"
+                            checked={reservationData.menu === '4'}
+                            onChange={handleRadioChange}
+                        />
+                    </div>
+                </form>
+            </ModalDefault>
+            <ModalDefault
                 title="Réservation de table"
                 isOpen={modalState === 'open'}
                 setIsOpen={() => setModalState('')}
-                confirmButton={<ValidationButton textButton={'Payer'} />}
+                confirmButton={<button type="submit" onClick={handleSubmit}>payer</button>}
             >
-                <form action="">
+                <form method="post">
+                    <div>
+                        <p className="text-red-600 flex justify-around items-center">{errorMessage}</p>
+                    </div>
                     <div>
                         <label htmlFor="name" className="block mb-2 text-sm font-medium">
                             {' '}
@@ -180,6 +270,14 @@ export const Home = () => {
                             id="name"
                             className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                             placeholder="John Doe"
+                            value={reservationData.name}
+                            onChange={(e) => {
+                                const { value } = e.target
+                                setReservationData((prevState) => ({
+                                    ...prevState,
+                                    name: value,
+                                }))
+                            }}
                             required
                         />
                     </div>
@@ -194,6 +292,14 @@ export const Home = () => {
                             id="name"
                             className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                             placeholder="email@email.com"
+                            value={reservationData.email}
+                            onChange={(e) => {
+                                const { value } = e.target
+                                setReservationData((prevState) => ({
+                                    ...prevState,
+                                    email: value,
+                                }))
+                            }}
                             required
                         />
                     </div>
@@ -208,39 +314,16 @@ export const Home = () => {
                             id="name"
                             className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
                             placeholder="06 01 01 01 01"
+                            value={reservationData.phoneNumber}
+                            onChange={(e) => {
+                                const { value } = e.target
+                                setReservationData((prevState) => ({
+                                    ...prevState,
+                                    phoneNumber: value,
+                                }))
+                            }}
                             required
                         />
-                    </div>
-                    <div>
-                        <label htmlFor="number" className="block mb-2 text-sm font-medium">
-                            {' '}
-                            Nombre de personnes:{' '}
-                        </label>
-                        <input
-                            type="number"
-                            name="number"
-                            id="number"
-                            className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                            placeholder="Ex: 4"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="timeReservation" className="block mb-2 text-sm font-medium">
-                            {' '}
-                            Heure de réservation:{' '}
-                        </label>
-                        <select
-                            id="time"
-                            className="bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        >
-                            <option value={{ startTime: '2024-05-27T12:00:00Z', endTime: '2024-05-27T15:00:00Z' }}>
-                                Après-midi
-                            </option>
-                            <option value={{ startTime: '2024-05-27T16:00:00Z', endTime: '2024-05-27T123:00:00Z' }}>
-                                Soir
-                            </option>
-                        </select>
                     </div>
                     <div className="flex items-start my-5">
                         <div className="flex items-center h-5">
@@ -249,10 +332,17 @@ export const Home = () => {
                                 type="checkbox"
                                 value=""
                                 className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
+                                checked={reservationData.termsAccepted}
+                                onChange={(e) =>
+                                    setReservationData((prevState) => ({
+                                        ...prevState,
+                                        termsAccepted: e.target.checked,
+                                    }))
+                                }
                                 required
                             />
                         </div>
-                        <label for="terms" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900">
+                        <label htmlFor="terms" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900">
                             J'accepte les{' '}
                             <a href="#" className="text-blue-600 hover:underline dark:text-blue-500">
                                 termes et conditions
