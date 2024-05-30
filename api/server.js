@@ -6,7 +6,7 @@ const reservationRoute = require('./routes/reservation.route');
 const tableRoute = require('./routes/table.route');
 
 const app = express();
-const port = 3003;
+const port = process.env.PORT;
 
 app.use(cors());
 app.use(express.json());
