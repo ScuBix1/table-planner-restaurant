@@ -1,14 +1,11 @@
 {
     "name": "table-planner-restaurant",
     "version": 2,
-    "functions": {
-      "api": {
-        "handler": "server.js"
-      }
-    },
+    "builds": [
+      { "src": "server.js", "use": "@vercel/node" }
+    ],
     "routes": [
-      { "src": "/(.*)", "dest": "/api" }
+      { "src": "/(.*)", "dest": "server.js" }
     ]
   }
-  
   
