@@ -6,6 +6,17 @@ router.get('/', async (req, res) => {
   const tables = await Table.find();
   res.json(tables);
 });
+router.get('/tableId/:id', async (req, res) => {
+  try {
+    const table = Table.findOne({ numberTable: req.params.id });
+    if (!table) {
+      return res.status(404).json({ message: 'aucune table trouvé' });
+    }
+    return res.status(200).json(table);
+  } catch (err) {
+    return res.status(400).json({message: err})
+  }
+});
 router.post('/', async (req, res) => {
   try {
     const { numberTable, price, statusTable, typeMenu } = req.body;

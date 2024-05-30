@@ -28,6 +28,7 @@ router.post('/', async (req, res) => {
       phoneNumber,
       timeReservation,
       termsAccepted,
+      typeMenu,
     } = req.body;
     let price = 0;
     let statusTable = 'free';
@@ -48,11 +49,9 @@ router.post('/', async (req, res) => {
         .json({ message: 'Le numéro de téléphone est invalide' });
     }
     if (termsAccepted === false) {
-      return res
-        .status(400)
-        .json({
-          message: 'Il faut accepter les termes pour procéder au paiement.',
-        });
+      return res.status(400).json({
+        message: 'Il faut accepter les termes pour procéder au paiement.',
+      });
     }
     //on cherche la table avec le bon id pour l'attribuer a la reservation
     const table = await Table.findOne({ numberTable: tableNumber });
@@ -68,9 +67,25 @@ router.post('/', async (req, res) => {
       timeReservation,
       termsAccepted,
     });
-    
 
     await newReservation.save();
+    if(!typeMenu){
+        res.status(400).json({message: 'Aucun menu n\'a été selectionné'})
+    }else if(typeMenu == 2){
+        table.price = 50
+        table.typeMenu = typeMenu
+    }else if(typeMenu == 4){
+        table.price = 100
+        table.typeMenu = typeMenu
+    }else if(typeMenu == 5){
+        table.price = 125
+        table.typeMenu = typeMenu
+    }else if(typeMenu == 15){
+        table.price = 375
+        table.typeMenu = typeMenu
+    }
+    table.statusTable = 'reserved';
+    await table.save();
     return res.json(newReservation);
   } catch (error) {
     return res.status(500).json(error);

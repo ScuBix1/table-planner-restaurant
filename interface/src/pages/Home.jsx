@@ -18,32 +18,26 @@ export const Home = () => {
         termsAccepted: false,
         menu: '',
     })
-    const [errorMessage, setErrorMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('')
     //fonction de requete pour le formulaire
     const handleSubmit = async (e) => {
         e.preventDefault()
-        try{
-            await axios.post('http://localhost:3003/api/reservation', 
-                {
-                    tableNumber: idTableSelected,
-                    customerName: reservationData.name,
-                    email: reservationData.email,
-                    phoneNumber: reservationData.phoneNumber,
-                    timeReservation: reservationData.timeReservation,
-                    termsAccepted: reservationData.termsAccepted,
-                }
-            );
-            await axios.put('http://localhost:3003/api/table', {
-                price: 1,
-                statusTable: 'reserved',
-                typeMenus: reservationData.menu,
+        try {
+            await axios.post('http://localhost:3003/api/reservation', {
+                tableNumber: idTableSelected,
+                customerName: reservationData.name,
+                email: reservationData.email,
+                phoneNumber: reservationData.phoneNumber,
+                timeReservation: reservationData.timeReservation,
+                termsAccepted: reservationData.termsAccepted,
+                typeMenu: reservationData.menu,
             })
-        }catch(error){
+        } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
-                setErrorMessage(error.response.data.message);
-              } else {
-                setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
-              }
+                setErrorMessage(error.response.data.message)
+            } else {
+                setErrorMessage('Une erreur est survenue. Veuillez réessayer.')
+            }
         }
     }
     //fonction pour obtenir le menu choisi
@@ -60,7 +54,7 @@ export const Home = () => {
             if (tables[i]?.numberTable == idNumber && tables[i]?.statusTable === 'reserved') {
                 tablesTab.push(
                     <TableReserved
-                        key={'table-' +  i}
+                        key={'table-' + i}
                         id={idNumber}
                         onClick={() => {
                             setIdTableSelected(tables[i].numberTable)
@@ -76,6 +70,7 @@ export const Home = () => {
                         onClick={() => {
                             setIdTableSelected(tables[i].numberTable)
                             setModalState('menu')
+                            setReservationData({ menu: '' })
                         }}
                     />
                 )
@@ -91,8 +86,8 @@ export const Home = () => {
             if (tables[i]?.numberTable === idNumber && tables[i]?.statusTable === 'reserved') {
                 petitsSalons.push(
                     <PetitSalonReserved
-                        key={ i}
-                        id={idNumber }
+                        key={i}
+                        id={idNumber}
                         onClick={() => {
                             setIdTableSelected(tables[i].numberTable)
                             setModalState('')
@@ -102,11 +97,12 @@ export const Home = () => {
             } else {
                 petitsSalons.push(
                     <PetitSalon
-                        key={ i}
+                        key={i}
                         id={idNumber}
                         onClick={() => {
                             setIdTableSelected(tables[i].numberTable)
                             setModalState('menu')
+                            setReservationData({ menu: '5' })
                         }}
                     />
                 )
@@ -130,6 +126,7 @@ export const Home = () => {
         setIdTableSelected(idTableSelected)
         getAllTables()
     }, [idTableSelected, modalState])
+    console.log(reservationData)
     return (
         <>
             {windowWidth > 800 ? (
@@ -155,6 +152,7 @@ export const Home = () => {
                         onClick={() => {
                             setIdTableSelected(300)
                             setModalState('menu')
+                            setReservationData({ menu: '' })
                         }}
                     />
                 ) : (
@@ -174,6 +172,7 @@ export const Home = () => {
                         onClick={() => {
                             setIdTableSelected(400)
                             setModalState('menu')
+                            setReservationData({ menu: '' })
                         }}
                     />
                 ) : (
@@ -195,6 +194,7 @@ export const Home = () => {
                             onClick={() => {
                                 setIdTableSelected(502)
                                 setModalState('menu')
+                                setReservationData({ menu: '15' })
                             }}
                         />
                     ) : (
@@ -217,43 +217,61 @@ export const Home = () => {
                 confirmButton={<ValidationButton textButton={'Continuer'} onClick={() => setModalState('open')} />}
             >
                 <form className="md:flex grid" method="post">
-                    <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
-                        <p>Entrée</p>
-                        <span>+</span>
-                        <p>Plat et boisson</p>
-                        <span>+</span>
-                        <p>Dessert</p>
-                        <input
-                            type="radio"
-                            className="menu"
-                            name="menu"
-                            value="2"
-                            checked={reservationData.menu === '2'}
-                            onChange={handleRadioChange}
-                        />
-                    </div>
-                    <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
-                        <p>Entrée</p>
-                        <span>+</span>
-                        <p>Plat et boisson</p>
-                        <span>+</span>
-                        <p>Dessert</p>
-                        <input
-                            type="radio"
-                            className="menu"
-                            name="menu"
-                            value="4"
-                            checked={reservationData.menu === '4'}
-                            onChange={handleRadioChange}
-                        />
-                    </div>
+                    {reservationData.menu !== '5' && reservationData.menu !== '15' ? (
+                        <>
+                            <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                                <p>Entrée</p>
+                                <span>+</span>
+                                <p>Plat et boisson</p>
+                                <span>+</span>
+                                <p>Dessert</p>
+                                <input
+                                    type="radio"
+                                    className="menu"
+                                    name="menu"
+                                    value="2"
+                                    checked={reservationData.menu === '2'}
+                                    onChange={handleRadioChange}
+                                />
+                            </div>
+                            <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                                <p>Entrée</p>
+                                <span>+</span>
+                                <p>Plat et boisson</p>
+                                <span>+</span>
+                                <p>Dessert</p>
+                                <input
+                                    type="radio"
+                                    className="menu"
+                                    name="menu"
+                                    value="4"
+                                    checked={reservationData.menu === '4'}
+                                    onChange={handleRadioChange}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                                <p>Entrée</p>
+                                <span>+</span>
+                                <p>Plat et boisson</p>
+                                <span>+</span>
+                                <p>Dessert</p>
+                            </div>
+                        </>
+                    )}
                 </form>
             </ModalDefault>
             <ModalDefault
                 title="Réservation de table"
                 isOpen={modalState === 'open'}
                 setIsOpen={() => setModalState('')}
-                confirmButton={<button type="submit" onClick={handleSubmit}>payer</button>}
+                confirmButton={
+                    <button type="submit" onClick={handleSubmit}>
+                        payer
+                    </button>
+                }
             >
                 <form method="post">
                     <div>
