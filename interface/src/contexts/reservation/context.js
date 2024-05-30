@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import axios from 'axios'
-import { useAsyncValue } from 'react-router-dom'
 const ReservationContext = createContext({
     tables: Array,
     modalState: String,
@@ -8,9 +7,6 @@ const ReservationContext = createContext({
     setModalState: () => {},
     setIdTableSelected: () => {},
     getAllTables: async () => {
-        return Promise.resolve()
-    },
-    getIdTable: async (id) => {
         return Promise.resolve()
     },
 })
@@ -22,16 +18,13 @@ export function ReservationContextProvider({ children }) {
 
     const getAllTables = async () => {
         axios
-            .get('http://localhost:3003/api/table')
+            .get(`https://table-planner-restaurant-1.onrender.com/api/table`)
             .then((response) => {
                 setTables(response.data)
             })
             .catch((error) => {
                 console.log(error)
             })
-    }
-    const getIdTable =  async (id) => {
-        axios.get(`http://localhost:3003/api/table/idTable/${id}`)
     }
     return (
         <ReservationContext.Provider
@@ -42,7 +35,6 @@ export function ReservationContextProvider({ children }) {
                 setModalState: setModalState,
                 setIdTableSelected: setIdTableSelected,
                 getAllTables: getAllTables,
-                getIdTable: getIdTable,
             }}
         >
             {children}

@@ -23,7 +23,7 @@ export const Home = () => {
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            await axios.post('http://localhost:3003/api/reservation', {
+            await axios.post(`https://table-planner-restaurant-1.onrender.com/api/reservation`, {
                 tableNumber: idTableSelected,
                 customerName: reservationData.name,
                 email: reservationData.email,
@@ -168,7 +168,7 @@ export const Home = () => {
                 {tables[16]?.numberTable === 400 && tables[16]?.statusTable === 'free' ? (
                     <Table
                         className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]"
-                        id="300"
+                        id="400"
                         onClick={() => {
                             setIdTableSelected(400)
                             setModalState('menu')
@@ -178,7 +178,7 @@ export const Home = () => {
                 ) : (
                     <TableReserved
                         className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]"
-                        id="300"
+                        id="400"
                         onClick={() => {
                             setIdTableSelected(400)
                             setModalState('')
