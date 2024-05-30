@@ -1,0 +1,14 @@
+{
+    "name": "table-planner-restaurant",
+    "version": 2,
+    "functions": {
+      "api": {
+        "handler": "server.js"
+      }
+    },
+    "routes": [
+      { "src": "/(.*)", "dest": "/api" }
+    ]
+  }
+  
+  
