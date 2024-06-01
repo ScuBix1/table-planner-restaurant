@@ -268,7 +268,7 @@ export const Home = () => {
                 isOpen={modalState === 'open'}
                 setIsOpen={() => setModalState('')}
                 confirmButton={
-                    <button type="submit" onClick={handleSubmit}>
+                    <button type="submit" className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6" onClick={handleSubmit}>
                         payer
                     </button>
                 }
