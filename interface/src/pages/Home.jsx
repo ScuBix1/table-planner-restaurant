@@ -220,6 +220,7 @@ export const Home = () => {
                     {reservationData.menu !== '5' && reservationData.menu !== '15' ? (
                         <>
                             <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                                <h3 className='font-bold mb-2'>Réservation pour 2 personnes:</h3>
                                 <p>Entrée</p>
                                 <span>+</span>
                                 <p>Plat et boisson</p>
@@ -235,6 +236,7 @@ export const Home = () => {
                                 />
                             </div>
                             <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                                <h3 className='font-bold mb-2'>Réservation pour 4 personnes:</h3>
                                 <p>Entrée</p>
                                 <span>+</span>
                                 <p>Plat et boisson</p>
@@ -253,6 +255,7 @@ export const Home = () => {
                     ) : (
                         <>
                             <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                                <h3 className='font-bold mb-2'>Menu pour {reservationData.menu} personnes:</h3>
                                 <p>Entrée</p>
                                 <span>+</span>
                                 <p>Plat et boisson</p>

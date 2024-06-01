@@ -11,7 +11,7 @@ export const Table = ({ className, id, onClick}) => {
                     className={`w-6 h-14 bg-[#49df4a] border-[#15a416] border-[1px] relative mx-auto asolute z-50 rounded-xl flex items-center justify-center`}
                 >
                     {' '}
-                    <p className="origin-center rotate-[-90deg]">4</p>{' '}
+                    <p className="origin-center rotate-[-90deg]">2-4</p>{' '}
                 </div>
                 <div className={`w-12 h-4 rounded-full bg-gray-400 absolute z-0 bottom-2`}></div>
             </div>
@@ -28,7 +28,7 @@ export const TableReserved = ({ className, id, onClick}) => {
                     className={`w-6 h-14 bg-red-400 border-red-900 border-[1px] relative mx-auto asolute z-50 rounded-xl flex items-center justify-center`}
                 >
                     {' '}
-                    <p className="origin-center rotate-[-90deg]">4</p>{' '}
+                    <p className="origin-center rotate-[-90deg]">2-4</p>{' '}
                 </div>
                 <div className={`w-12 h-4 rounded-full bg-gray-400 absolute z-0 bottom-2`}></div>
             </div>
