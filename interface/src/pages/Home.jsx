@@ -3,7 +3,7 @@ import { Table, TableReserved } from '../components/table'
 import { GrandSalon, GrandSalonReserved, PetitSalon, PetitSalonReserved } from '../components/salon'
 import Logo from '../assets/img/logo.png'
 import { ModalDefault } from '../components/modal'
-import { ValidationButton, ValidationSubmitButton } from '../components/button'
+import { ValidationButton } from '../components/button'
 import { useReservation } from '../contexts/reservation'
 import axios from 'axios'
 
@@ -32,6 +32,9 @@ export const Home = () => {
                 termsAccepted: reservationData.termsAccepted,
                 typeMenu: reservationData.menu,
             })
+            if(reservationData.menu === '4'){
+                window.location.href = "https://buy.stripe.com/4gw3e99gs1tacnKbII"
+            }
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
                 setErrorMessage(error.response.data.message)
@@ -51,7 +54,7 @@ export const Home = () => {
     const renderTables = (initCount, count, idNumber) => {
         const tablesTab = []
         for (let i = initCount; i < initCount + count; i++) {
-            if (tables[i]?.numberTable == idNumber && tables[i]?.statusTable === 'reserved') {
+            if (tables[i]?.numberTable === idNumber && tables[i]?.statusTable === 'reserved') {
                 tablesTab.push(
                     <TableReserved
                         key={'table-' + i}
@@ -125,7 +128,7 @@ export const Home = () => {
     useEffect(() => {
         setIdTableSelected(idTableSelected)
         getAllTables()
-    }, [idTableSelected, modalState])
+    }, [tables, idTableSelected, modalState])
     console.log(reservationData)
     return (
         <>
@@ -214,13 +217,14 @@ export const Home = () => {
                 title="Choix du menu"
                 isOpen={modalState === 'menu'}
                 setIsOpen={() => setModalState('')}
-                confirmButton={<ValidationButton textButton={'Continuer'} onClick={() => setModalState('open')} />}
+                confirmButton={reservationData.menu !== '' && <ValidationButton textButton={'Continuer'} onClick={() => setModalState('open')} />}
             >
                 <form className="md:flex grid" method="post">
                     {reservationData.menu !== '5' && reservationData.menu !== '15' ? (
                         <>
                             <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
                                 <h3 className='font-bold mb-2'>Réservation pour 2 personnes:</h3>
+                                <h4 className='font-bold mb-2 text-green-700'>80 €</h4>
                                 <p>Entrée</p>
                                 <span>+</span>
                                 <p>Plat et boisson</p>
@@ -237,6 +241,7 @@ export const Home = () => {
                             </div>
                             <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
                                 <h3 className='font-bold mb-2'>Réservation pour 4 personnes:</h3>
+                                <h4 className='font-bold mb-2 text-green-700'>150 €</h4>
                                 <p>Entrée</p>
                                 <span>+</span>
                                 <p>Plat et boisson</p>
@@ -256,6 +261,7 @@ export const Home = () => {
                         <>
                             <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
                                 <h3 className='font-bold mb-2'>Menu pour {reservationData.menu} personnes:</h3>
+                                <h4 className='font-bold mb-2 text-green-700'>{reservationData.menu === '5'?<>200 €</>:reservationData.menu === '15' && <>720 €</>}</h4>
                                 <p>Entrée</p>
                                 <span>+</span>
                                 <p>Plat et boisson</p>
@@ -264,7 +270,9 @@ export const Home = () => {
                             </div>
                         </>
                     )}
+                    
                 </form>
+                {reservationData.menu !== '' && <p className='text-center my-4'>{`Vous avez choisi le menu ${reservationData.menu} personnes`}</p>}
             </ModalDefault>
             <ModalDefault
                 title="Réservation de table"
