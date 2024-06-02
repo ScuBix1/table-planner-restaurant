@@ -257,7 +257,7 @@ export const Home = () => {
                 </header>
             )}
             <h2 className="text-center">Réservez votre table pour l'événement</h2>
-            <div className="h-[80vh] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
+            <div className="h-[100vh] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
                 <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>
                 <div className="absolute bottom-0 left-[30vw]">
                     {renderTablesTwo(9, 6, 200)}
