@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { Table, TableReserved } from '../components/table'
+import {
+    Table,
+    TableFivePeople,
+    TableFivePeopleReserved,
+    TableReserved,
+    TableTwoPeople,
+    TableTwoPeopleReserved,
+} from '../components/table'
 import { GrandSalon, GrandSalonReserved, PetitSalon, PetitSalonReserved } from '../components/salon'
 import Logo from '../assets/img/logo.png'
 import { ModalDefault } from '../components/modal'
@@ -32,8 +39,14 @@ export const Home = () => {
                 termsAccepted: reservationData.termsAccepted,
                 typeMenu: reservationData.menu,
             })
-            if(reservationData.menu === '4'){
-                window.location.href = "https://buy.stripe.com/4gw3e99gs1tacnKbII"
+            if (reservationData.menu === '2') {
+                window.location.href = 'https://buy.stripe.com/9AQ5mh1O09ZG4Vi3cg'
+            } else if (reservationData.menu === '4') {
+                window.location.href = 'https://buy.stripe.com/4gw3e99gs1tacnKbII'
+            } else if (reservationData.menu === '5') {
+                window.location.href = 'https://buy.stripe.com/5kA4id0JW7RyfzWcMO'
+            } else if (reservationData.menu === '15') {
+                window.location.href = 'https://buy.stripe.com/5kAeWR64g5Jq9by003'
             }
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -50,7 +63,39 @@ export const Home = () => {
             menu: e.target.value,
         }))
     }
-    //création des petites tables du restaurant
+    //création des tables de deux personnes du restaurant
+    const renderTablesTwo = (initCount, count, idNumber) => {
+        const tablesTab = []
+        for (let i = initCount; i < initCount + count; i++) {
+            if (tables[i]?.numberTable === idNumber && tables[i]?.statusTable === 'reserved') {
+                tablesTab.push(
+                    <TableTwoPeopleReserved
+                        key={'table-' + i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('')
+                        }}
+                    />
+                )
+            } else {
+                tablesTab.push(
+                    <TableTwoPeople
+                        key={'table-' + i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('menu')
+                            setReservationData({ menu: '2' })
+                        }}
+                    />
+                )
+            }
+            idNumber++
+        }
+        return tablesTab
+    }
+    //création des tables de quatre personnes du restaurant
     const renderTables = (initCount, count, idNumber) => {
         const tablesTab = []
         for (let i = initCount; i < initCount + count; i++) {
@@ -73,7 +118,39 @@ export const Home = () => {
                         onClick={() => {
                             setIdTableSelected(tables[i].numberTable)
                             setModalState('menu')
-                            setReservationData({ menu: '' })
+                            setReservationData({ menu: '4' })
+                        }}
+                    />
+                )
+            }
+            idNumber++
+        }
+        return tablesTab
+    }
+    //creation des tables de cinq personnes du restaurant
+    const renderTablesCinq = (initCount, count, idNumber) => {
+        const tablesTab = []
+        for (let i = initCount; i < initCount + count; i++) {
+            if (tables[i]?.numberTable === idNumber && tables[i]?.statusTable === 'reserved') {
+                tablesTab.push(
+                    <TableFivePeopleReserved
+                        key={'table-' + i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('')
+                        }}
+                    />
+                )
+            } else {
+                tablesTab.push(
+                    <TableFivePeople
+                        key={'table-' + i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('menu')
+                            setReservationData({ menu: '5' })
                         }}
                     />
                 )
@@ -114,7 +191,43 @@ export const Home = () => {
         }
 
         return petitsSalons
-    } //useEffect de redimensionnement de la fenetre
+    }
+    //création des petits salons du restaurant
+    const renderGrandsSalons = (initCount, count, idNumber) => {
+        const petitsSalons = []
+        for (let i = initCount; i < initCount + count; i++) {
+            if (tables[i]?.numberTable === idNumber && tables[i]?.statusTable === 'reserved') {
+                petitsSalons.push(
+                    <GrandSalonReserved
+                        key={i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('')
+                        }}
+                        className={'flex justify-center items-center'}
+                    />
+                )
+            } else {
+                petitsSalons.push(
+                    <GrandSalon
+                        key={i}
+                        id={idNumber}
+                        onClick={() => {
+                            setIdTableSelected(tables[i].numberTable)
+                            setModalState('menu')
+                            setReservationData({ menu: '15' })
+                        }}
+                        className={'flex justify-center items-center'}
+                    />
+                )
+            }
+            idNumber++
+        }
+
+        return petitsSalons
+    }
+    //useEffect de redimensionnement de la fenetre
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth)
@@ -129,7 +242,6 @@ export const Home = () => {
         setIdTableSelected(idTableSelected)
         getAllTables()
     }, [tables, idTableSelected, modalState])
-    console.log(reservationData)
     return (
         <>
             {windowWidth > 800 ? (
@@ -145,141 +257,67 @@ export const Home = () => {
                 </header>
             )}
             <h2 className="text-center">Réservez votre table pour l'événement</h2>
-            <div className="h-[80vh] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto ">
+            <div className="h-[80vh] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
                 <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>
-                <div className="absolute bottom-0 left-[30vw]">{renderTables(9, 6, 200)}</div>
-                {tables[15]?.numberTable === 300 && tables[15]?.statusTable === 'free' ? (
-                    <Table
-                        className="absolute right-1 lg:right-4 lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem] origin-center rotate-[-90deg]"
-                        id="300"
-                        onClick={() => {
-                            setIdTableSelected(300)
-                            setModalState('menu')
-                            setReservationData({ menu: '' })
-                        }}
-                    />
-                ) : (
-                    <TableReserved
-                        className="absolute right-1 lg:right-4 lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem] origin-center rotate-[-90deg]"
-                        id="300"
-                        onClick={() => {
-                            setIdTableSelected(300)
-                            setModalState('')
-                        }}
-                    />
-                )}
-                {tables[16]?.numberTable === 400 && tables[16]?.statusTable === 'free' ? (
-                    <Table
-                        className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]"
-                        id="400"
-                        onClick={() => {
-                            setIdTableSelected(400)
-                            setModalState('menu')
-                            setReservationData({ menu: '' })
-                        }}
-                    />
-                ) : (
-                    <TableReserved
-                        className="absolute md:right-[20vw] lg:right-[23vw] right-[38vw] lg:bottom-[27rem] md:bottom-[21rem] bottom-[20rem]"
-                        id="400"
-                        onClick={() => {
-                            setIdTableSelected(400)
-                            setModalState('')
-                        }}
-                    />
-                )}
+                <div className="absolute bottom-0 left-[30vw]">
+                    {renderTablesTwo(9, 6, 200)}
+                    {renderTablesCinq(15, 2, 206)}
+                    {renderTablesTwo(17, 1, 208)}
+                    {renderTables(18, 4, 209)}
+                </div>
                 <div className="absolute bottom-0 right-0 w-[50vw] md:w-[28vw] h-[30vh]">
-                    <div className="absolute left-0 bottom-32">{renderPetitsSalons(17, 2, 500)}</div>
-                    {tables[19]?.numberTable === 502 && tables[19]?.statusTable === 'free' ? (
-                        <GrandSalon
-                            className="absolute bottom-0 right-0 flex justify-center items-center"
-                            id="502"
-                            onClick={() => {
-                                setIdTableSelected(502)
-                                setModalState('menu')
-                                setReservationData({ menu: '15' })
-                            }}
-                        />
-                    ) : (
-                        <GrandSalonReserved
-                            className="absolute bottom-0 right-0 flex justify-center items-center"
-                            id="502"
-                            onClick={() => {
-                                setIdTableSelected(502)
-                                setModalState('')
-                            }}
-                        />
-                    )}
-                    <div className="absolute right-0 bottom-32">{renderPetitsSalons(20, 2, 503)}</div>
+                    <div className="absolute left-0 bottom-32">{renderPetitsSalons(22, 2, 500)}</div>
+                    <div className="absolute bottom-0">{renderGrandsSalons(24, 1, 502)}</div>
+                    <div className="absolute right-0 bottom-32">{renderPetitsSalons(25, 2, 503)}</div>
                 </div>
             </div>
             <ModalDefault
                 title="Choix du menu"
                 isOpen={modalState === 'menu'}
                 setIsOpen={() => setModalState('')}
-                confirmButton={reservationData.menu !== '' && <ValidationButton textButton={'Continuer'} onClick={() => setModalState('open')} />}
+                confirmButton={
+                    reservationData.menu !== '' && (
+                        <ValidationButton textButton={'Continuer'} onClick={() => setModalState('open')} />
+                    )
+                }
             >
                 <form className="md:flex grid" method="post">
-                    {reservationData.menu !== '5' && reservationData.menu !== '15' ? (
-                        <>
-                            <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
-                                <h3 className='font-bold mb-2'>Réservation pour 2 personnes:</h3>
-                                <h4 className='font-bold mb-2 text-green-700'>80 €</h4>
-                                <p>Entrée</p>
-                                <span>+</span>
-                                <p>Plat et boisson</p>
-                                <span>+</span>
-                                <p>Dessert</p>
-                                <input
-                                    type="radio"
-                                    className="menu"
-                                    name="menu"
-                                    value="2"
-                                    checked={reservationData.menu === '2'}
-                                    onChange={handleRadioChange}
-                                />
-                            </div>
-                            <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
-                                <h3 className='font-bold mb-2'>Réservation pour 4 personnes:</h3>
-                                <h4 className='font-bold mb-2 text-green-700'>150 €</h4>
-                                <p>Entrée</p>
-                                <span>+</span>
-                                <p>Plat et boisson</p>
-                                <span>+</span>
-                                <p>Dessert</p>
-                                <input
-                                    type="radio"
-                                    className="menu"
-                                    name="menu"
-                                    value="4"
-                                    checked={reservationData.menu === '4'}
-                                    onChange={handleRadioChange}
-                                />
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
-                                <h3 className='font-bold mb-2'>Menu pour {reservationData.menu} personnes:</h3>
-                                <h4 className='font-bold mb-2 text-green-700'>{reservationData.menu === '5'?<>200 €</>:reservationData.menu === '15' && <>720 €</>}</h4>
-                                <p>Entrée</p>
-                                <span>+</span>
-                                <p>Plat et boisson</p>
-                                <span>+</span>
-                                <p>Dessert</p>
-                            </div>
-                        </>
-                    )}
-                    
+                    <>
+                        <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
+                            <h3 className="font-bold mb-2">Menu pour {reservationData.menu} personnes:</h3>
+                            <h4 className="font-bold mb-2 text-green-700">
+                                {reservationData.menu === '2' ? (
+                                    <>80 €</>
+                                ) : reservationData.menu === '4' ? (
+                                    <>150 €</>
+                                ) : reservationData.menu === '5' ? (
+                                    <>200 €</>
+                                ) : (
+                                    reservationData.menu === '15' && <>720 €</>
+                                )}
+                            </h4>
+                            <p>Entrée</p>
+                            <span>+</span>
+                            <p>Plat et boisson</p>
+                            <span>+</span>
+                            <p>Dessert</p>
+                        </div>
+                    </>
                 </form>
-                {reservationData.menu !== '' && <p className='text-center my-4'>{`Vous avez choisi le menu ${reservationData.menu} personnes`}</p>}
+                {reservationData.menu !== '' && (
+                    <p className="text-center my-4">{`Vous avez choisi le menu ${reservationData.menu} personnes`}</p>
+                )}
             </ModalDefault>
             <ModalDefault
                 title="Réservation de table"
                 isOpen={modalState === 'open'}
                 setIsOpen={() => setModalState('')}
                 confirmButton={
-                    <button type="submit" className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6" onClick={handleSubmit}>
+                    <button
+                        type="submit"
+                        className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6"
+                        onClick={handleSubmit}
+                    >
                         payer
                     </button>
                 }
