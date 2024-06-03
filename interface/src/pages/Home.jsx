@@ -10,7 +10,7 @@ import {
 import { GrandSalon, GrandSalonReserved, PetitSalon, PetitSalonReserved } from '../components/salon'
 import Logo from '../assets/img/logo.png'
 import { ModalDefault } from '../components/modal'
-import { ValidationButton } from '../components/button'
+import { AnnulationButton, ValidationButton } from '../components/button'
 import { useReservation } from '../contexts/reservation'
 import axios from 'axios'
 
@@ -242,28 +242,6 @@ export const Home = () => {
         setIdTableSelected(idTableSelected)
         getAllTables()
     }, [tables, idTableSelected, modalState])
-    const initialInnerHeight = window.innerHeight;
-
-  window.addEventListener('resize', () => {
-    const currentInnerHeight = window.innerHeight;
-
-    // Si la taille de la fenêtre a diminué de plus de 100px, c'est probablement dû à l'ouverture du clavier
-    if (initialInnerHeight - currentInnerHeight > 100) {
-      // Ajustez la hauteur de votre modale ou de votre contenu ici
-      document.querySelector('.modal').style.bottom = '30vh';
-
-      // Faites défiler jusqu'au champ actif
-      const activeElement = document.activeElement;
-      if (activeElement && (activeElement.tagName === 'input' || activeElement.tagName === 'textarea')) {
-        setTimeout(() => {
-          activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 300);
-      }
-    } else {
-      // Rétablir l'état original lorsque le clavier est fermé
-      document.querySelector('.modal').style.bottom = '';
-    }
-  });
     return (
         <>
             {windowWidth > 800 ? (
@@ -278,22 +256,137 @@ export const Home = () => {
                     <h1 className="md:text-[64px] text-[32px] text-center font-great-vibes">Royaume de Saba</h1>
                 </header>
             )}
-
-            <h2 className="text-center">Réservez votre table pour l'événement</h2>
-            <div className="h-[100vh] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
-                <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>
-                <div className="absolute bottom-0 left-[30vw]">
-                    {renderTablesTwo(9, 6, 200)}
-                    {renderTablesCinq(15, 2, 206)}
-                    {renderTablesTwo(17, 1, 208)}
-                    {renderTables(18, 4, 209)}
+            {modalState === 'open' ? (
+                <div className='h-[70vh] w-[100vw] flex flex-col justify-center items-center'>
+                    <h2 className="text-center">Informations de la réservation</h2>
+                    <form method="post" className='w-[40vw] mx-auto'>
+                        <div>
+                            <p className="text-red-600 flex justify-around items-center">{errorMessage}</p>
+                        </div>
+                        <div>
+                            <label htmlFor="name" className="block mb-2 text-sm font-medium">
+                                {' '}
+                                Nom pour la réservation:{' '}
+                            </label>
+                            <input
+                                type="text"
+                                name="name"
+                                id="name"
+                                className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                                placeholder="John Doe"
+                                value={reservationData.name}
+                                onChange={(e) => {
+                                    const { value } = e.target
+                                    setReservationData((prevState) => ({
+                                        ...prevState,
+                                        name: value,
+                                    }))
+                                }}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="name" className="block mb-2 text-sm font-medium">
+                                {' '}
+                                Email:{' '}
+                            </label>
+                            <input
+                                type="text"
+                                name="name"
+                                id="name"
+                                className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                                placeholder="email@email.com"
+                                value={reservationData.email}
+                                onChange={(e) => {
+                                    const { value } = e.target
+                                    setReservationData((prevState) => ({
+                                        ...prevState,
+                                        email: value,
+                                    }))
+                                }}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="name" className="block mb-2 text-sm font-medium">
+                                {' '}
+                                Téléphone:{' '}
+                            </label>
+                            <input
+                                type="text"
+                                name="name"
+                                id="name"
+                                className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
+                                placeholder="06 01 01 01 01"
+                                value={reservationData.phoneNumber}
+                                onChange={(e) => {
+                                    const { value } = e.target
+                                    setReservationData((prevState) => ({
+                                        ...prevState,
+                                        phoneNumber: value,
+                                    }))
+                                }}
+                                required
+                            />
+                        </div>
+                        <div className="flex items-start my-5">
+                            <div className="flex items-center h-5">
+                                <input
+                                    id="terms"
+                                    type="checkbox"
+                                    value=""
+                                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
+                                    checked={reservationData.termsAccepted}
+                                    onChange={(e) =>
+                                        setReservationData((prevState) => ({
+                                            ...prevState,
+                                            termsAccepted: e.target.checked,
+                                        }))
+                                    }
+                                    required
+                                />
+                            </div>
+                            <label
+                                htmlFor="terms"
+                                className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900"
+                            >
+                                J'accepte les{' '}
+                                <a href="#" className="text-blue-600 hover:underline dark:text-blue-500">
+                                    termes et conditions
+                                </a>
+                            </label>
+                        </div>
+                        <div className=' w-[20vw] mx-auto flex justify-around items-center'>
+                            <AnnulationButton
+                                onClick={()=>setModalState('')}
+                                className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#fb7185] via-[#e11d48] to-[#be123c] hover:cursor-pointer hover:shadow-xl hover:shadow-red-500 hover:scale-105 duration-300 hover:from-[#be123c] hover:to-[#fb7185] mb-6" textButton={'Annuler'} /><button
+                        type="submit"
+                        className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6"
+                        onClick={handleSubmit}
+                    >
+                        payer
+                    </button></div>
+                    </form>
                 </div>
-                <div className="absolute bottom-0 right-0 w-[50vw] md:w-[28vw] h-[30vh]">
-                    <div className="absolute left-0 bottom-32">{renderPetitsSalons(22, 2, 500)}</div>
-                    <div className="absolute bottom-0">{renderGrandsSalons(24, 1, 502)}</div>
-                    <div className="absolute right-0 bottom-32">{renderPetitsSalons(25, 2, 503)}</div>
-                </div>
-            </div>
+            ) : (
+                <>
+                    <h2 className="text-center">Réservez votre table pour l'événement</h2>
+                    <div className="h-[700px] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
+                        <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>
+                        <div className="absolute bottom-0 left-[30vw]">
+                            {renderTablesTwo(9, 6, 200)}
+                            {renderTablesCinq(15, 2, 206)}
+                            {renderTablesTwo(17, 1, 208)}
+                            {renderTables(18, 4, 209)}
+                        </div>
+                        <div className="absolute bottom-0 right-0 w-[50vw] md:w-[28vw] h-[30vh]">
+                            <div className="absolute left-0 bottom-32">{renderPetitsSalons(22, 2, 500)}</div>
+                            <div className="absolute bottom-0">{renderGrandsSalons(24, 1, 502)}</div>
+                            <div className="absolute right-0 bottom-32">{renderPetitsSalons(25, 2, 503)}</div>
+                        </div>
+                    </div>
+                </>
+            )}
             <ModalDefault
                 title="Choix du menu"
                 isOpen={modalState === 'menu'}
@@ -330,116 +423,6 @@ export const Home = () => {
                 {reservationData.menu !== '' && (
                     <p className="text-center my-4">{`Vous avez choisi le menu ${reservationData.menu} personnes`}</p>
                 )}
-            </ModalDefault>
-            <ModalDefault
-                title="Réservation de table"
-                isOpen={modalState === 'open'}
-                setIsOpen={() => setModalState('')}
-                confirmButton={
-                    <button
-                        type="submit"
-                        className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6"
-                        onClick={handleSubmit}
-                    >
-                        payer
-                    </button>
-                }
-            >
-                <form method="post">
-                    <div>
-                        <p className="text-red-600 flex justify-around items-center">{errorMessage}</p>
-                    </div>
-                    <div>
-                        <label htmlFor="name" className="block mb-2 text-sm font-medium">
-                            {' '}
-                            Nom pour la réservation:{' '}
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                            placeholder="John Doe"
-                            value={reservationData.name}
-                            onChange={(e) => {
-                                const { value } = e.target
-                                setReservationData((prevState) => ({
-                                    ...prevState,
-                                    name: value,
-                                }))
-                            }}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="name" className="block mb-2 text-sm font-medium">
-                            {' '}
-                            Email:{' '}
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                            placeholder="email@email.com"
-                            value={reservationData.email}
-                            onChange={(e) => {
-                                const { value } = e.target
-                                setReservationData((prevState) => ({
-                                    ...prevState,
-                                    email: value,
-                                }))
-                            }}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="name" className="block mb-2 text-sm font-medium">
-                            {' '}
-                            Téléphone:{' '}
-                        </label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                            placeholder="06 01 01 01 01"
-                            value={reservationData.phoneNumber}
-                            onChange={(e) => {
-                                const { value } = e.target
-                                setReservationData((prevState) => ({
-                                    ...prevState,
-                                    phoneNumber: value,
-                                }))
-                            }}
-                            required
-                        />
-                    </div>
-                    <div className="flex items-start my-5">
-                        <div className="flex items-center h-5">
-                            <input
-                                id="terms"
-                                type="checkbox"
-                                value=""
-                                className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
-                                checked={reservationData.termsAccepted}
-                                onChange={(e) =>
-                                    setReservationData((prevState) => ({
-                                        ...prevState,
-                                        termsAccepted: e.target.checked,
-                                    }))
-                                }
-                                required
-                            />
-                        </div>
-                        <label htmlFor="terms" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900">
-                            J'accepte les{' '}
-                            <a href="#" className="text-blue-600 hover:underline dark:text-blue-500">
-                                termes et conditions
-                            </a>
-                        </label>
-                    </div>
-                </form>
             </ModalDefault>
         </>
     )
