@@ -322,7 +322,6 @@ export const Home = () => {
                         payer
                     </button>
                 }
-                className={'h-[80vh] py-auto'}
             >
                 <form method="post">
                     <div>
