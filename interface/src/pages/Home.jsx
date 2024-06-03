@@ -250,13 +250,11 @@ export const Home = () => {
     // Si la taille de la fenêtre a diminué de plus de 100px, c'est probablement dû à l'ouverture du clavier
     if (initialInnerHeight - currentInnerHeight > 100) {
       // Ajustez la hauteur de votre modale ou de votre contenu ici
-      document.querySelector('.modal').style.bottom = '0';
-      document.querySelector('.modal').style.height = '70%'; // Exemple : ajuster la hauteur
-      document.querySelector('.modal').style.overflowY = 'scroll'; // Activer le défilement si nécessaire
+      document.querySelector('.modal').style.bottom = '30vh';
 
       // Faites défiler jusqu'au champ actif
       const activeElement = document.activeElement;
-      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+      if (activeElement && (activeElement.tagName === 'input' || activeElement.tagName === 'textarea')) {
         setTimeout(() => {
           activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 300);
@@ -264,8 +262,6 @@ export const Home = () => {
     } else {
       // Rétablir l'état original lorsque le clavier est fermé
       document.querySelector('.modal').style.bottom = '';
-      document.querySelector('.modal').style.height = ''; // Rétablir la hauteur originale
-      document.querySelector('.modal').style.overflowY = 'auto'; // Rétablir le comportement original
     }
   });
     return (
