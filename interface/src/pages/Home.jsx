@@ -264,7 +264,7 @@ export const Home = () => {
             {modalState === 'open' ? (
                 <div className="h-[70vh] w-[100vw] flex flex-col justify-center items-center">
                     <h2 className="text-center">Informations de la réservation</h2>
-                    <form method="post" className="w-[40vw] mx-auto">
+                    <form method="post" className="w-[60vw] mx-auto">
                         <div>
                             <p className="text-red-600 flex justify-around items-center">{errorMessage}</p>
                         </div>
@@ -322,7 +322,7 @@ export const Home = () => {
                                 name="name"
                                 id="name"
                                 className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                                placeholder="06 01 01 01 01"
+                                placeholder="0601010101"
                                 value={reservationData.phoneNumber}
                                 onChange={(e) => {
                                     const { value } = e.target
@@ -361,7 +361,7 @@ export const Home = () => {
                                 </a>
                             </label>
                         </div>
-                        <div className=" w-[20vw] mx-auto flex justify-around items-center">
+                        <div className=" w-full md:w-[30vw] mx-auto flex justify-around items-center gap-4">
                             <AnnulationButton
                                 onClick={() => setModalState('')}
                                 className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#fb7185] via-[#e11d48] to-[#be123c] hover:cursor-pointer hover:shadow-xl hover:shadow-red-500 hover:scale-105 duration-300 hover:from-[#be123c] hover:to-[#fb7185] mb-6"
