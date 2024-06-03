@@ -242,6 +242,13 @@ export const Home = () => {
         setIdTableSelected(idTableSelected)
         getAllTables()
     }, [tables, idTableSelected, modalState])
+    document.querySelectorAll('input, textarea, select').forEach((el) => {
+        el.addEventListener('focus', (event) => {
+          setTimeout(() => {
+            event.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 300); // Le délai permet d'attendre que le clavier soit complètement ouvert
+        });
+      });
     return (
         <>
             {windowWidth > 800 ? (
