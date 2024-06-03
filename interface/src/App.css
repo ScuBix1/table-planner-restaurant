@@ -3,6 +3,19 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 
+#hero{
+  background-image: url('./assets/img/hero-desktop.webp');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position:  top;
+}
+@media (max-width: 800px) {
+  #hero-mobile{
+  background-image: url('./assets/img/flyers.webp');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+}
 .App {
   text-align: center;
 }

@@ -13,6 +13,7 @@ import { ModalDefault } from '../components/modal'
 import { AnnulationButton, ValidationButton } from '../components/button'
 import { useReservation } from '../contexts/reservation'
 import axios from 'axios'
+import { HeroLarge, HeroSmall } from '../components/hero'
 
 export const Home = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
@@ -245,21 +246,25 @@ export const Home = () => {
     return (
         <>
             {windowWidth > 800 ? (
-                <header className="flex justify-around items-center">
-                    <img src={Logo} alt="logo du Royaume de Saba Paris 16ème" className="w-[100px] rounded-full" />
-                    <h1 className="md:text-[64px] text-[32px] text-center font-great-vibes">Royaume de Saba</h1>
-                    <img src={Logo} alt="logo du Royaume de Saba Paris 16ème" className="w-[100px] rounded-full" />
-                </header>
+                <>
+                    <header className="flex justify-around items-center">
+                        <img src={Logo} alt="logo du Royaume de Saba Paris 16ème" className="w-[100px] rounded-full" />
+                        <h1 className="md:text-[64px] text-[32px] text-center font-great-vibes">Royaume de Saba</h1>
+                        <img src={Logo} alt="logo du Royaume de Saba Paris 16ème" className="w-[100px] rounded-full" />
+                    </header>
+                </>
             ) : (
-                <header className="flex justify-center items-center gap-x-2">
-                    <img src={Logo} alt="logo du Royaume de Saba Paris 16ème" className="w-[100px] rounded-full" />
-                    <h1 className="md:text-[64px] text-[32px] text-center font-great-vibes">Royaume de Saba</h1>
-                </header>
+                <>
+                    <header className="flex justify-center items-center gap-x-2">
+                        <img src={Logo} alt="logo du Royaume de Saba Paris 16ème" className="w-[100px] rounded-full" />
+                        <h1 className="md:text-[64px] text-[32px] text-center font-great-vibes">Royaume de Saba</h1>
+                    </header>
+                </>
             )}
             {modalState === 'open' ? (
-                <div className='h-[70vh] w-[100vw] flex flex-col justify-center items-center'>
+                <div className="h-[70vh] w-[100vw] flex flex-col justify-center items-center">
                     <h2 className="text-center">Informations de la réservation</h2>
-                    <form method="post" className='w-[40vw] mx-auto'>
+                    <form method="post" className="w-[40vw] mx-auto">
                         <div>
                             <p className="text-red-600 flex justify-around items-center">{errorMessage}</p>
                         </div>
@@ -356,20 +361,25 @@ export const Home = () => {
                                 </a>
                             </label>
                         </div>
-                        <div className=' w-[20vw] mx-auto flex justify-around items-center'>
+                        <div className=" w-[20vw] mx-auto flex justify-around items-center">
                             <AnnulationButton
-                                onClick={()=>setModalState('')}
-                                className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#fb7185] via-[#e11d48] to-[#be123c] hover:cursor-pointer hover:shadow-xl hover:shadow-red-500 hover:scale-105 duration-300 hover:from-[#be123c] hover:to-[#fb7185] mb-6" textButton={'Annuler'} /><button
-                        type="submit"
-                        className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6"
-                        onClick={handleSubmit}
-                    >
-                        payer
-                    </button></div>
+                                onClick={() => setModalState('')}
+                                className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#fb7185] via-[#e11d48] to-[#be123c] hover:cursor-pointer hover:shadow-xl hover:shadow-red-500 hover:scale-105 duration-300 hover:from-[#be123c] hover:to-[#fb7185] mb-6"
+                                textButton={'Annuler'}
+                            />
+                            <button
+                                type="submit"
+                                className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6"
+                                onClick={handleSubmit}
+                            >
+                                payer
+                            </button>
+                        </div>
                     </form>
                 </div>
             ) : (
                 <>
+                    <HeroLarge/>
                     <h2 className="text-center">Réservez votre table pour l'événement</h2>
                     <div className="h-[700px] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
                         <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>
