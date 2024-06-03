@@ -1,7 +1,7 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@nextui-org/modal'
 import { AnnulationButton } from './button'
 
-export const ModalDefault = ({ title, isOpen, setIsOpen, children, confirmButton, backButton, backMethod }) => {
+export const ModalDefault = ({ title, isOpen, setIsOpen, children, confirmButton, backButton, backMethod, className }) => {
     return (
         <Modal
             isOpen={isOpen}
@@ -15,7 +15,7 @@ export const ModalDefault = ({ title, isOpen, setIsOpen, children, confirmButton
             closeButton={<span className="absolute text-white bg-black"></span>}
             onClose={() => setIsOpen(false)}
         >
-            <ModalContent className="grid left-0">
+            <ModalContent className={`grid left-0 ${className?className:''}`}>
                 <ModalHeader className="grid">
                     <div className="p-1" onTouchEnd={() => setIsOpen(false)}>
                         <div className="w-10 h-1 mx-auto mb-4 bg-gray-300 rounded"></div>
