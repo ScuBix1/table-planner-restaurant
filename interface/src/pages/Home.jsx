@@ -63,6 +63,8 @@ export const Home = () => {
                         phone: reservationData.phoneNumber,
                     })
                     console.log(response)
+                    const clientSecret = response.data.clientSecret
+                    console.log(clientSecret)
                     if (response.data.success) {
                         const res = await axios.post(`https://table-planner-restaurant-1.onrender.com/api/reservation`, {
                             tableNumber: idTableSelected,
@@ -74,15 +76,34 @@ export const Home = () => {
                             typeMenu: reservationData.menu,
                         })
                             
-                            setSuccessMessage(response.data.message)
-                            confetti({
-                                particleCount: 200,
-                                spread: 70,
-                                origin: { y: 0.6 }
+
+                            stripe.confirmCardPayment(clientSecret).then(function(result) {
+                                if (result.error) {
+                                  console.error(result.error.message);
+                                } else {
+                                  if (result.paymentIntent.status === 'succeeded') {
+                                    setSuccessMessage(response.data.message)
+                                    confetti({
+                                      particleCount: 200,
+                                      spread: 70,
+                                      origin: { y: 0.6 }
+                                    });
+                                  } else if (result.paymentIntent.status === 'requires_action') {
+                                    stripe.confirmCardPayment(clientSecret).then(function(result) {
+                                      if (result.error) {
+                                        console.error(result.error.message);
+                                      } else if (result.paymentIntent.status === 'succeeded') {
+                                        setSuccessMessage(response.data.message)
+                                        confetti({
+                                          particleCount: 200,
+                                          spread: 70,
+                                          origin: { y: 0.6 }
+                                        });
+                                      }
+                                    });
+                                  }
+                                }
                               });
-                              setTimeout(function() {
-                                window.location.href = '/';
-                              }, 5000); 
                             
                     }else{
                         setErrorMessage(response.data.message)
