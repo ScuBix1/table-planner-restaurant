@@ -435,7 +435,7 @@ export const Home = () => {
                         </div>
                         <div className=" w-full md:w-[30vw] mx-auto flex justify-around items-center gap-4">
                             <AnnulationButton
-                                onClick={() => setModalState('')}
+                                onClick={() => {setModalState(''); setIdTableSelected('')}}
                                 className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#fb7185] via-[#e11d48] to-[#be123c] hover:cursor-pointer hover:shadow-xl hover:shadow-red-500 hover:scale-105 duration-300 hover:from-[#be123c] hover:to-[#fb7185] mb-6"
                                 textButton={'Annuler'}
                             />
