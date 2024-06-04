@@ -37,7 +37,7 @@ mongoose
 app.use('/api/table', tableRoute);
 app.use('/api/reservation', reservationRoute);
 app.post('/api/stripe/charge', cors(), async (req,res)=>{
-  let {amount, id} = req.body
+  let {amount, id, email, phone} = req.body
   console.log("amound & id: ",amount,id )
   try {
     const payment = await stripe.paymentIntents.create({
@@ -46,6 +46,9 @@ app.post('/api/stripe/charge', cors(), async (req,res)=>{
       description: 'Réservation Royaume de Saba',
       payment_method: id,
       confirm: true,
+      email: email,
+      phone: phone,
+      payment_method_types: ['card'],
       automatic_payment_methods: {
         enabled: true,
         allow_redirects: 'never' // ou utilisez 'return_url' selon votre choix

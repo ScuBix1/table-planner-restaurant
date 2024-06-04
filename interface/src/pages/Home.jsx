@@ -58,6 +58,8 @@ export const Home = () => {
                     const response = await axios.post('https://table-planner-restaurant-1.onrender.com/api/stripe/charge', {
                         amount: amount,
                         id: id,
+                        email: reservationData.email,
+                        phone: reservationData.phoneNumber,
                     })
                     console.log(response)
                     if (response.data.success) {
@@ -70,6 +72,7 @@ export const Home = () => {
                             termsAccepted: reservationData.termsAccepted,
                             typeMenu: reservationData.menu,
                         })
+                            await stripe.paymentIntents.confirm(id)
                             setSuccessMessage(response.data.message)
                     }else{
                         setErrorMessage(response.data.message)
