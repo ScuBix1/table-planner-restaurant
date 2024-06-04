@@ -357,7 +357,7 @@ export const Home = () => {
                                 className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900"
                             >
                                 J'accepte les{' '}
-                                <a href="#" className="text-blue-600 hover:underline dark:text-blue-500">
+                                <a href="https://royaume-de-saba.onrender.com/termes-et-conditions" target="_blank" className="text-blue-600 hover:underline dark:text-blue-500">
                                     termes et conditions
                                 </a>
                             </label>
