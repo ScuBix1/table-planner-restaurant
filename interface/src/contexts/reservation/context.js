@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 const ReservationContext = createContext({
     tables: Array,
@@ -26,6 +26,9 @@ export function ReservationContextProvider({ children }) {
                 console.log(error)
             })
     }
+    useEffect(()=>{
+        setTables(tables)
+    },[tables])
     return (
         <ReservationContext.Provider
             value={{

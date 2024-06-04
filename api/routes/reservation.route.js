@@ -72,16 +72,16 @@ router.post('/', async (req, res) => {
     if(!typeMenu){
         res.status(400).json({message: 'Aucun menu n\'a été selectionné'})
     }else if(typeMenu == 2){
-        table.price = 50
+        table.price = 80
         table.typeMenu = typeMenu
     }else if(typeMenu == 4){
-        table.price = 100
+        table.price = 150
         table.typeMenu = typeMenu
     }else if(typeMenu == 5){
-        table.price = 125
+        table.price = 200
         table.typeMenu = typeMenu
     }else if(typeMenu == 15){
-        table.price = 375
+        table.price = 720
         table.typeMenu = typeMenu
     }
     table.statusTable = 'reserved';

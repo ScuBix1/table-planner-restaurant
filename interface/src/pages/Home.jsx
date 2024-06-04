@@ -16,8 +16,11 @@ import axios from 'axios'
 import { HeroLarge } from '../components/hero'
 import { ParcoursUtilisateurs } from '../components/parcoursUtilisateur'
 import { Link } from 'react-router-dom'
+import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 
 export const Home = () => {
+    const stripe = useStripe()
+    const elements = useElements()
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const { setIdTableSelected, idTableSelected, setModalState, modalState, tables, getAllTables } = useReservation()
     const [reservationData, setReservationData] = useState({
@@ -29,33 +32,59 @@ export const Home = () => {
         menu: '',
     })
     const [errorMessage, setErrorMessage] = useState('')
+    const [successMessage, setSuccessMessage] = useState('')
     //fonction de requete pour le formulaire
     const handleSubmit = async (e) => {
         e.preventDefault()
         try {
-            await axios.post(`https://table-planner-restaurant-1.onrender.com/api/reservation`, {
-                tableNumber: idTableSelected,
-                customerName: reservationData.name,
-                email: reservationData.email,
-                phoneNumber: reservationData.phoneNumber,
-                timeReservation: reservationData.timeReservation,
-                termsAccepted: reservationData.termsAccepted,
-                typeMenu: reservationData.menu,
-            })
+            let amount = 0
             if (reservationData.menu === '2') {
-                window.location.href = 'https://buy.stripe.com/9AQ5mh1O09ZG4Vi3cg'
+                amount = 8000
             } else if (reservationData.menu === '4') {
-                window.location.href = 'https://buy.stripe.com/4gw3e99gs1tacnKbII'
+                amount = 15000
             } else if (reservationData.menu === '5') {
-                window.location.href = 'https://buy.stripe.com/5kA4id0JW7RyfzWcMO'
+                amount = 20000
             } else if (reservationData.menu === '15') {
-                window.location.href = 'https://buy.stripe.com/5kAeWR64g5Jq9by003'
+                amount = 72000
+            }
+            const { error, paymentMethod } = await stripe.createPaymentMethod({
+                type: 'card',
+                card: elements.getElement(CardElement),
+            })
+            if (!error) {
+                try {
+                    const { id } = paymentMethod
+                    const response = await axios.post('http://table-planner-restaurant-1.onrender.com/api/stripe/charge', {
+                        amount: amount,
+                        id: id,
+                    })
+                    if (response.data.success) {
+                        const res = await axios.post(`https://table-planner-restaurant-1.onrender.com/api/reservation`, {
+                            tableNumber: idTableSelected,
+                            customerName: reservationData.name,
+                            email: reservationData.email,
+                            phoneNumber: reservationData.phoneNumber,
+                            timeReservation: reservationData.timeReservation,
+                            termsAccepted: reservationData.termsAccepted,
+                            typeMenu: reservationData.menu,
+                        })
+                            setSuccessMessage(response.data.message)
+                    }else{
+                        setErrorMessage(response.data.message)
+                        setSuccessMessage('')
+                    }
+                } catch (err) {
+                    setErrorMessage(err.response.data.message)
+                    setSuccessMessage('')
+                }
             }
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
                 setErrorMessage(error.response.data.message)
+                setSuccessMessage('')
             } else {
                 setErrorMessage('Une erreur est survenue. Veuillez réessayer.')
+                setSuccessMessage('')
             }
         }
     }
@@ -235,7 +264,6 @@ export const Home = () => {
     }, [])
     //useEffect pour accéder aux tables réservées
     useEffect(() => {
-        
         setIdTableSelected(idTableSelected)
         getAllTables()
     }, [idTableSelected])
@@ -262,7 +290,7 @@ export const Home = () => {
                     <h2 className="text-center">Informations de la réservation</h2>
                     <form method="post" className="w-[60vw] mx-auto">
                         <div>
-                            <p className="text-red-600 flex justify-around items-center">{errorMessage}</p>
+                            {successMessage?<p className="text-green-600 flex justify-around items-center">{successMessage?successMessage:''}</p>: errorMessage&&<p className="text-red-600 flex justify-around items-center">{errorMessage?errorMessage:''}</p>}
                         </div>
                         <div>
                             <label htmlFor="name" className="block mb-2 text-sm font-medium">
@@ -330,6 +358,13 @@ export const Home = () => {
                                 required
                             />
                         </div>
+                        <div className="my-6">
+                        <label htmlFor="name" className="block mb-2 text-sm font-medium">
+                                {' '}
+                                Numéro de carte:{' '}
+                            </label>
+                            <CardElement options={{ hidePostalCode: true }} className="w-full shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" />
+                        </div>
                         <div className="flex items-start my-5">
                             <div className="flex items-center h-5">
                                 <input
@@ -347,12 +382,17 @@ export const Home = () => {
                                     required
                                 />
                             </div>
+
                             <label
                                 htmlFor="terms"
                                 className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900"
                             >
                                 J'accepte les{' '}
-                                <Link to="/termes-et-conditions" target="_blank" className="text-blue-600 hover:underline dark:text-blue-500">
+                                <Link
+                                    to="/termes-et-conditions"
+                                    target="_blank"
+                                    className="text-blue-600 hover:underline dark:text-blue-500"
+                                >
                                     termes et conditions
                                 </Link>
                             </label>
@@ -363,20 +403,29 @@ export const Home = () => {
                                 className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#fb7185] via-[#e11d48] to-[#be123c] hover:cursor-pointer hover:shadow-xl hover:shadow-red-500 hover:scale-105 duration-300 hover:from-[#be123c] hover:to-[#fb7185] mb-6"
                                 textButton={'Annuler'}
                             />
-                            <button
+                            {reservationData.name&& reservationData.email&& reservationData.phoneNumber&&reservationData.termsAccepted===true?(<button
                                 type="submit"
                                 className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6"
                                 onClick={handleSubmit}
+                                disabled='true'
                             >
                                 payer
-                            </button>
+                            </button>):(<button
+                                type="submit"
+                                className="flex justify-center items-center gap-2 w-28 h-12 cursor-normal rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r bg-gray-700 mb-6"
+                                onClick={handleSubmit}
+                                disabled='true'
+                            >
+                                payer
+                            </button>)}
+                            
                         </div>
                     </form>
                 </div>
             ) : (
                 <>
-                    <HeroLarge/>
-                    <ParcoursUtilisateurs/>
+                    <HeroLarge />
+                    <ParcoursUtilisateurs />
                     <h2 className="text-center">Réservez votre table pour l'événement</h2>
                     <div className="h-[700px] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
                         <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>

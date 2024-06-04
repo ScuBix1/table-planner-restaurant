@@ -4,6 +4,8 @@ import './App.css'
 import { Home } from './pages/Home'
 import { ReservationContextProvider } from './contexts/reservation'
 import { TermesEtConditions } from './pages/TermesConditions'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 
 function Router() {
     return (
@@ -14,12 +16,17 @@ function Router() {
     )
 }
 export default function App() {
+    const PUBLIC_KEY =
+    'pk_live_51PMsM4BjG7na9ODgPV1nhJrpQ1qlKuO1erTUhcwsO0Sjae2CTRLyWACKXQMu5DZuTwmReQPTcCiLPHotlYZDrkO600RVwGielE'
+const stripeTestPromise = loadStripe(PUBLIC_KEY)
     const navigate = useNavigate()
     return (
         <NextUIProvider navigate={navigate}>
+            <Elements stripe={stripeTestPromise}>
             <ReservationContextProvider>
                 <Router />
             </ReservationContextProvider>
+            </Elements>
         </NextUIProvider>
     )
 }
