@@ -235,9 +235,10 @@ export const Home = () => {
     }, [])
     //useEffect pour accéder aux tables réservées
     useEffect(() => {
+        
         setIdTableSelected(idTableSelected)
         getAllTables()
-    }, [tables, idTableSelected, modalState])
+    }, [idTableSelected])
     return (
         <>
             {windowWidth > 800 ? (
