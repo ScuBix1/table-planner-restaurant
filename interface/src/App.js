@@ -16,9 +16,8 @@ function Router() {
     )
 }
 export default function App() {
-    const PUBLIC_KEY =
-    'pk_live_51PMsM4BjG7na9ODgPV1nhJrpQ1qlKuO1erTUhcwsO0Sjae2CTRLyWACKXQMu5DZuTwmReQPTcCiLPHotlYZDrkO600RVwGielE'
-const stripeTestPromise = loadStripe(PUBLIC_KEY)
+    
+const stripeTestPromise = loadStripe(process.env.PUBLIC_KEY)
     const navigate = useNavigate()
     return (
         <NextUIProvider navigate={navigate}>
