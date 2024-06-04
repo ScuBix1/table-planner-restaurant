@@ -4,8 +4,9 @@ import { Click, Paiement, PaiementValid, Stylo, Validation } from './icon'
 export const ParcoursUtilisateurs = () => {
     return (
             
-            <section className="pb-14 px-14 flex lg:flex-row flex-col gap-4">
+            <section className="pb-14 px-14">
                 <h2>Parcours de votre réservation</h2>
+                <div className="flex lg:flex-row flex-col gap-4">
                 <Card
                     svg={<Click height={'20px'} width={'20px'} color={'#4b5563'} />}
                     title={'Choisissez votre table'}
@@ -43,6 +44,8 @@ export const ParcoursUtilisateurs = () => {
                         'Une fois le paiement réussi votre réservation est validée. Dans les autres cas la table sera libérée.'
                     }
                 />
+                </div>
+                
             </section>
     )
 }
