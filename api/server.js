@@ -53,6 +53,7 @@ app.post('/api/stripe/charge', cors(), async (req,res)=>{
       },
     })
     res.json({
+      clientSecret: payment.client_secret,
       message: "paiement réussi !",
       success: true,
     })
