@@ -13,8 +13,9 @@ import { ModalDefault } from '../components/modal'
 import { AnnulationButton, ValidationButton } from '../components/button'
 import { useReservation } from '../contexts/reservation'
 import axios from 'axios'
-import { HeroLarge, HeroSmall } from '../components/hero'
+import { HeroLarge } from '../components/hero'
 import { ParcoursUtilisateurs } from '../components/parcoursUtilisateur'
+import { Link } from 'react-router-dom'
 
 export const Home = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
@@ -57,13 +58,6 @@ export const Home = () => {
                 setErrorMessage('Une erreur est survenue. Veuillez réessayer.')
             }
         }
-    }
-    //fonction pour obtenir le menu choisi
-    const handleRadioChange = (e) => {
-        setReservationData((prevState) => ({
-            ...prevState,
-            menu: e.target.value,
-        }))
     }
     //création des tables de deux personnes du restaurant
     const renderTablesTwo = (initCount, count, idNumber) => {
@@ -357,9 +351,9 @@ export const Home = () => {
                                 className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900"
                             >
                                 J'accepte les{' '}
-                                <a href="/termes-et-conditions" target="_blank" className="text-blue-600 hover:underline dark:text-blue-500">
+                                <Link to="/termes-et-conditions" target="_blank" className="text-blue-600 hover:underline dark:text-blue-500">
                                     termes et conditions
-                                </a>
+                                </Link>
                             </label>
                         </div>
                         <div className=" w-full md:w-[30vw] mx-auto flex justify-around items-center gap-4">
