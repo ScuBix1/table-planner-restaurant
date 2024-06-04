@@ -16,7 +16,7 @@ function Router() {
     )
 }
 export default function App() {
-const cle = 'pk_test_51PMqJECFT6qMhDwJfQ1IGUVwRQS56qKeBFJc6D12luMjObx6kGkPdoH7ZOnIfysyUGlPs2DqAKXDIvaRXz3sjExt00LXSKMCk6'
+const cle = 'pk_live_51PMsM4BjG7na9ODgPV1nhJrpQ1qlKuO1erTUhcwsO0Sjae2CTRLyWACKXQMu5DZuTwmReQPTcCiLPHotlYZDrkO600RVwGielE'
 const stripeTestPromise = loadStripe(cle)
     const navigate = useNavigate()
     return (
