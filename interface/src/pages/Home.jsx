@@ -14,6 +14,7 @@ import { AnnulationButton, ValidationButton } from '../components/button'
 import { useReservation } from '../contexts/reservation'
 import axios from 'axios'
 import { HeroLarge, HeroSmall } from '../components/hero'
+import { ParcoursUtilisateurs } from '../components/parcoursUtilisateur'
 
 export const Home = () => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
@@ -380,6 +381,7 @@ export const Home = () => {
             ) : (
                 <>
                     <HeroLarge/>
+                    <ParcoursUtilisateurs/>
                     <h2 className="text-center">Réservez votre table pour l'événement</h2>
                     <div className="h-[700px] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
                         <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>

@@ -3,6 +3,11 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 
+h2{
+  font-family: 'Great Vibes';
+  font-size: 3rem;
+  text-align: center;
+}
 #hero{
   background-image: url('./assets/img/hero-desktop.webp');
   background-repeat: no-repeat;
