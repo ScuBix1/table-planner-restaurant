@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import confetti from 'canvas-confetti';
 import {
     Table,
     TableFivePeople,
@@ -55,7 +56,7 @@ export const Home = () => {
             if (!error) {
                 try {
                     const { id } = paymentMethod
-                    const response = await axios.post('https://table-planner-restaurant-1.onrender.com/api/stripe/charge', {
+                    const response = await axios.post('http://localhost:3003/api/stripe/charge', {
                         amount: amount,
                         id: id,
                         email: reservationData.email,
@@ -72,8 +73,17 @@ export const Home = () => {
                             termsAccepted: reservationData.termsAccepted,
                             typeMenu: reservationData.menu,
                         })
-                            await stripe.paymentIntents.confirm(id)
+                            
                             setSuccessMessage(response.data.message)
+                            confetti({
+                                particleCount: 200,
+                                spread: 70,
+                                origin: { y: 0.6 }
+                              });
+                              setTimeout(function() {
+                                window.location.href = '/';
+                              }, 5000); 
+                            
                     }else{
                         setErrorMessage(response.data.message)
                         setSuccessMessage('')

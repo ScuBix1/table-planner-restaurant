@@ -45,14 +45,12 @@ app.post('/api/stripe/charge', cors(), async (req,res)=>{
       currency: 'EUR',
       description: 'Réservation Royaume de Saba',
       payment_method: id,
-      confirm: true,
-      email: email,
-      phone: phone,
+      confirmation_method: 'automatic',
+      receipt_email: email,
       payment_method_types: ['card'],
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: 'never' // ou utilisez 'return_url' selon votre choix
-      }
+      metadata: {
+        'phone_number': phone,
+      },
     })
     res.json({
       message: "paiement réussi !",
