@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const port = process.env.PORT || 3000;
-const stripe = require('stripe')(process.env.SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
