@@ -17,6 +17,7 @@ import { HeroLarge } from '../components/hero'
 import { ParcoursUtilisateurs } from '../components/parcoursUtilisateur'
 import { Link } from 'react-router-dom'
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { Footer } from '../components/footer'
 
 export const Home = () => {
     const stripe = useStripe()
@@ -427,7 +428,7 @@ export const Home = () => {
                     <HeroLarge />
                     <ParcoursUtilisateurs />
                     <h2 className="text-center">Réservez votre table pour l'événement</h2>
-                    <div className="h-[700px] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto">
+                    <div className="h-[700px] md:w-[70vw] bg-[#484d48] relative rounded-xl mx-auto p-auto mb-14">
                         <div className="absolute bottom-0 left-4">{renderTables(0, 9, 100)}</div>
                         <div className="absolute bottom-0 left-[30vw]">
                             {renderTablesTwo(9, 6, 200)}
@@ -441,6 +442,7 @@ export const Home = () => {
                             <div className="absolute right-0 bottom-32">{renderPetitsSalons(25, 2, 503)}</div>
                         </div>
                     </div>
+                    <Footer/>
                 </>
             )}
             <ModalDefault
