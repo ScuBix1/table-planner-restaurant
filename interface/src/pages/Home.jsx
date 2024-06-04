@@ -55,7 +55,7 @@ export const Home = () => {
             if (!error) {
                 try {
                     const { id } = paymentMethod
-                    const response = await axios.post('http://table-planner-restaurant-1.onrender.com/api/stripe/charge', {
+                    const response = await axios.post('https://table-planner-restaurant-1.onrender.com/api/stripe/charge', {
                         amount: amount,
                         id: id,
                     })
