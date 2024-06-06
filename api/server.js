@@ -48,13 +48,12 @@ app.post('/api/stripe/charge', async (req, res) => {
       line_items: [
         {
           price: priceId,
-          price_data:{
             currency: 'EUR',
             product_data: {
               name: `Table n° ${tableNumber}`,
               unit_amount: amount,
             },
-          },
+
           quantity: 1,
         },
       ],
