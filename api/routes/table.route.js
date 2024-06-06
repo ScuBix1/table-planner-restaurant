@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Table = require('../models/table.model');
 
+
 router.get('/', async (req, res) => {
   const tables = await Table.find();
   res.json(tables);

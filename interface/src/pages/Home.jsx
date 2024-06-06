@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import confetti from 'canvas-confetti';
+import confetti from 'canvas-confetti'
 import {
     Table,
     TableFivePeople,
@@ -11,18 +11,13 @@ import {
 import { GrandSalon, GrandSalonReserved, PetitSalon, PetitSalonReserved } from '../components/salon'
 import Logo from '../assets/img/logo.png'
 import { ModalDefault } from '../components/modal'
-import { AnnulationButton, ValidationButton } from '../components/button'
 import { useReservation } from '../contexts/reservation'
-import axios from 'axios'
 import { HeroLarge } from '../components/hero'
 import { ParcoursUtilisateurs } from '../components/parcoursUtilisateur'
-import { Link } from 'react-router-dom'
-import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { Footer } from '../components/footer'
+import { Message } from '../components/produit'
 
 export const Home = () => {
-    const stripe = useStripe()
-    const elements = useElements()
     const [windowWidth, setWindowWidth] = useState(window.innerWidth)
     const { setIdTableSelected, idTableSelected, setModalState, modalState, tables, getAllTables } = useReservation()
     const [reservationData, setReservationData] = useState({
@@ -33,97 +28,7 @@ export const Home = () => {
         termsAccepted: false,
         menu: '',
     })
-    const [errorMessage, setErrorMessage] = useState('')
-    const [successMessage, setSuccessMessage] = useState('')
-    //fonction de requete pour le formulaire
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            let amount = 0
-            if (reservationData.menu === '2') {
-                amount = 8000
-            } else if (reservationData.menu === '4') {
-                amount = 15000
-            } else if (reservationData.menu === '5') {
-                amount = 20000
-            } else if (reservationData.menu === '15') {
-                amount = 72000
-            }
-            const { error, paymentMethod } = await stripe.createPaymentMethod({
-                type: 'card',
-                card: elements.getElement(CardElement),
-            })
-            if (!error) {
-                try {
-                    const { id } = paymentMethod
-                    const response = await axios.post('https://table-planner-restaurant-1.onrender.com/api/stripe/charge', {
-                        amount: amount,
-                        id: id,
-                        email: reservationData.email,
-                        phone: reservationData.phoneNumber,
-                    })
-                    console.log(response)
-                    const clientSecret = response.data.clientSecret
-                    console.log(clientSecret)
-                    if (response.data.success) {
-                        const res = await axios.post(`https://table-planner-restaurant-1.onrender.com/api/reservation`, {
-                            tableNumber: idTableSelected,
-                            customerName: reservationData.name,
-                            email: reservationData.email,
-                            phoneNumber: reservationData.phoneNumber,
-                            timeReservation: reservationData.timeReservation,
-                            termsAccepted: reservationData.termsAccepted,
-                            typeMenu: reservationData.menu,
-                        })
-                            
-
-                            stripe.confirmCardPayment(clientSecret).then(function(result) {
-                                if (result.error) {
-                                  console.error(result.error.message);
-                                } else {
-                                  if (result.paymentIntent.status === 'succeeded') {
-                                    setSuccessMessage(response.data.message)
-                                    confetti({
-                                      particleCount: 200,
-                                      spread: 70,
-                                      origin: { y: 0.6 }
-                                    });
-                                  } else if (result.paymentIntent.status === 'requires_action') {
-                                    stripe.confirmCardPayment(clientSecret).then(function(result) {
-                                      if (result.error) {
-                                        console.error(result.error.message);
-                                      } else if (result.paymentIntent.status === 'succeeded') {
-                                        setSuccessMessage(response.data.message)
-                                        confetti({
-                                          particleCount: 200,
-                                          spread: 70,
-                                          origin: { y: 0.6 }
-                                        });
-                                      }
-                                    });
-                                  }
-                                }
-                              });
-                            
-                    }else{
-                        setErrorMessage(response.data.message)
-                        setSuccessMessage('')
-                    }
-                } catch (err) {
-                    setErrorMessage(err.response.data.message)
-                    setSuccessMessage('')
-                }
-            }
-        } catch (error) {
-            if (error.response && error.response.data && error.response.data.message) {
-                setErrorMessage(error.response.data.message)
-                setSuccessMessage('')
-            } else {
-                setErrorMessage('Une erreur est survenue. Veuillez réessayer.')
-                setSuccessMessage('')
-            }
-        }
-    }
+    const [message, setMessage] = useState('')
     //création des tables de deux personnes du restaurant
     const renderTablesTwo = (initCount, count, idNumber) => {
         const tablesTab = []
@@ -302,7 +207,24 @@ export const Home = () => {
     useEffect(() => {
         setIdTableSelected(idTableSelected)
         getAllTables()
-    }, [idTableSelected])
+    }, [idTableSelected, tables])
+    useEffect(() => {
+        // Check to see if this is a redirect back from Checkout
+        const query = new URLSearchParams(window.location.search)
+
+        if (query.get('payment_success')) {
+            confetti({
+                particleCount: 200,
+                spread: 70,
+                origin: { y: 0.6 }
+              });
+            setMessage(<p className='text-green-700 text-center'>Paiement réalisé avec succès !</p>)
+        }
+
+        if (query.get('canceled')) {
+            setMessage(<p className='text-red-700 text-center'>Votre paiement a échoué !</p>)
+        }
+    }, [])
     return (
         <>
             {windowWidth > 800 ? (
@@ -321,145 +243,9 @@ export const Home = () => {
                     </header>
                 </>
             )}
-            {modalState === 'open' ? (
-                <div className="h-[70vh] w-[100vw] flex flex-col justify-center items-center">
-                    <h2 className="text-center">Informations de la réservation</h2>
-                    <form method="post" className="w-[60vw] mx-auto">
-                        <div>
-                            {successMessage?<p className="text-green-600 flex justify-around items-center">{successMessage?successMessage:''}</p>: errorMessage&&<p className="text-red-600 flex justify-around items-center">{errorMessage?errorMessage:''}</p>}
-                        </div>
-                        <div>
-                            <label htmlFor="name" className="block mb-2 text-sm font-medium">
-                                {' '}
-                                Nom pour la réservation:{' '}
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                                placeholder="John Doe"
-                                value={reservationData.name}
-                                onChange={(e) => {
-                                    const { value } = e.target
-                                    setReservationData((prevState) => ({
-                                        ...prevState,
-                                        name: value,
-                                    }))
-                                }}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="name" className="block mb-2 text-sm font-medium">
-                                {' '}
-                                Email:{' '}
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                                placeholder="email@email.com"
-                                value={reservationData.email}
-                                onChange={(e) => {
-                                    const { value } = e.target
-                                    setReservationData((prevState) => ({
-                                        ...prevState,
-                                        email: value,
-                                    }))
-                                }}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="name" className="block mb-2 text-sm font-medium">
-                                {' '}
-                                Téléphone:{' '}
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                className="shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light"
-                                placeholder="0601010101"
-                                value={reservationData.phoneNumber}
-                                onChange={(e) => {
-                                    const { value } = e.target
-                                    setReservationData((prevState) => ({
-                                        ...prevState,
-                                        phoneNumber: value,
-                                    }))
-                                }}
-                                required
-                            />
-                        </div>
-                        <div className="my-6">
-                        <label htmlFor="name" className="block mb-2 text-sm font-medium">
-                                {' '}
-                                Numéro de carte:{' '}
-                            </label>
-                            <CardElement options={{ hidePostalCode: true }} className="w-full shadow-sm bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-300 dark:border-gray-600 dark:placeholder-gray-400 dark:text-gray-900 dark:focus:ring-blue-500 dark:focus:border-blue-500 dark:shadow-sm-light" />
-                        </div>
-                        <div className="flex items-start my-5">
-                            <div className="flex items-center h-5">
-                                <input
-                                    id="terms"
-                                    type="checkbox"
-                                    value=""
-                                    className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
-                                    checked={reservationData.termsAccepted}
-                                    onChange={(e) =>
-                                        setReservationData((prevState) => ({
-                                            ...prevState,
-                                            termsAccepted: e.target.checked,
-                                        }))
-                                    }
-                                    required
-                                />
-                            </div>
-
-                            <label
-                                htmlFor="terms"
-                                className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-900"
-                            >
-                                J'accepte les{' '}
-                                <Link
-                                    to="/termes-et-conditions"
-                                    target="_blank"
-                                    className="text-blue-600 hover:underline dark:text-blue-500"
-                                >
-                                    termes et conditions
-                                </Link>
-                            </label>
-                        </div>
-                        <div className=" w-full md:w-[30vw] mx-auto flex justify-around items-center gap-4">
-                            <AnnulationButton
-                                onClick={() => {setModalState(''); setIdTableSelected('')}}
-                                className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#fb7185] via-[#e11d48] to-[#be123c] hover:cursor-pointer hover:shadow-xl hover:shadow-red-500 hover:scale-105 duration-300 hover:from-[#be123c] hover:to-[#fb7185] mb-6"
-                                textButton={'Annuler'}
-                            />
-                            {reservationData.name&& reservationData.email&& reservationData.phoneNumber&&reservationData.termsAccepted===true?(<button
-                                type="submit"
-                                className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6"
-                                onClick={handleSubmit}
-                                disabled={false}
-                            >
-                                payer
-                            </button>):(<button
-                                type="submit"
-                                className="flex justify-center items-center gap-2 w-28 h-12 cursor-normal rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r bg-gray-700 mb-6"
-                                onClick={handleSubmit}
-                                disabled={true}
-                            >
-                                payer
-                            </button>)}
-                            
-                        </div>
-                    </form>
-                </div>
-            ) : (
+            {
                 <>
+                    {message && <Message message={message} />}
                     <HeroLarge />
                     <ParcoursUtilisateurs />
                     <h2 className="text-center">Réservez votre table pour l'événement</h2>
@@ -477,21 +263,20 @@ export const Home = () => {
                             <div className="absolute right-0 bottom-32">{renderPetitsSalons(25, 2, 503)}</div>
                         </div>
                     </div>
-                    <Footer/>
+                    <Footer />
                 </>
-            )}
+            }
             <ModalDefault
                 title="Choix du menu"
                 isOpen={modalState === 'menu'}
                 setIsOpen={() => setModalState('')}
-                confirmButton={
-                    reservationData.menu !== '' && (
-                        <ValidationButton textButton={'Continuer'} onClick={() => setModalState('open')} />
-                    )
-                }
+                confirmButton={<></>}
+                backButton={<></>}
             >
-                <form className="md:flex grid" method="post">
+                <form  action={'https://table-planner-restaurant-1.onrender.com/api/stripe/charge'} className="grid" method="POST">
                     <>
+                        <input type="hidden" name="menu" value={reservationData.menu}/>
+                        <input type="hidden" name="tableNumber" value={idTableSelected}/>
                         <div className="flex flex-col justify-center items-center border-2 border-black p-4 m-4">
                             <h3 className="font-bold mb-2">Menu pour {reservationData.menu} personnes:</h3>
                             <h4 className="font-bold mb-2 text-green-700">
@@ -510,7 +295,19 @@ export const Home = () => {
                             <p>Plat et boisson</p>
                             <span>+</span>
                             <p>Dessert</p>
+                            
                         </div>
+                        <div className="flex justify-center items-center">
+
+                            <button
+                    type="submit"
+                    className="flex justify-center items-center gap-2 w-28 h-12 cursor-pointer rounded-md shadow-2xl text-white font-semibold bg-gradient-to-r from-[#66f466] via-[#0dac0e] to-[#105712] hover:cursor-pointer hover:shadow-md hover:shadow-green-500 hover:scale-105 duration-300 hover:from-[#105712] hover:to-[#66f466] mb-6"
+                    
+                >
+                    Continuer
+                </button>
+                        </div>
+                        
                     </>
                 </form>
                 {reservationData.menu !== '' && (
