@@ -28,14 +28,19 @@ app.use('/api/reservation', reservationRoute);
 app.post('/api/stripe/charge', async (req, res) => {
   try {
     const { menu, tableNumber } = req.body;
+    let amount = 0;
     if (menu === '2') {
       priceId = 'price_1PNFzlBjG7na9ODgVawNkRKT';
+      amount = 80*100
     } else if (menu === '4') {
       priceId = 'price_1PMt4ABjG7na9ODgSFgIsKVk';
+      amount = 150*100
     } else if (menu === '5') {
       priceId = 'price_1PMtnZBjG7na9ODgOoZXclAg';
+      amount = 200*100
     } else if (menu === '15') {
       priceId = 'price_1PMtqlBjG7na9ODgzrqK0b2b';
+      amount = 720*100
     } else {
       return res.status(400).send('Invalid menu value');
     }
@@ -43,6 +48,13 @@ app.post('/api/stripe/charge', async (req, res) => {
       line_items: [
         {
           price: priceId,
+          price_data:{
+            currency: 'EUR',
+            product_data: {
+              name: `Table n° ${tableNumber}`,
+              unit_amount: amount,
+            },
+          },
           quantity: 1,
         },
       ],

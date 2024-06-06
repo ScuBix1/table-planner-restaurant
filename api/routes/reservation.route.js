@@ -69,23 +69,6 @@ router.post('/', async (req, res) => {
     });
 
     await newReservation.save();
-    if(!typeMenu){
-        res.status(400).json({message: 'Aucun menu n\'a été selectionné'})
-    }else if(typeMenu == 2){
-        table.price = 80
-        table.typeMenu = typeMenu
-    }else if(typeMenu == 4){
-        table.price = 150
-        table.typeMenu = typeMenu
-    }else if(typeMenu == 5){
-        table.price = 200
-        table.typeMenu = typeMenu
-    }else if(typeMenu == 15){
-        table.price = 720
-        table.typeMenu = typeMenu
-    }
-    table.statusTable = 'reserved';
-    await table.save();
     return res.json(newReservation);
   } catch (error) {
     return res.status(500).json(error);
