@@ -209,7 +209,7 @@ export const Home = () => {
     }, [idTableSelected])
     useEffect(()=>{
         getAllTables()
-    }, [tables])
+    }, [])
     useEffect(() => {
         // Check to see if this is a redirect back from Checkout
         const query = new URLSearchParams(window.location.search)
