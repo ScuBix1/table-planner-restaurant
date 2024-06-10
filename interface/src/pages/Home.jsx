@@ -206,10 +206,11 @@ export const Home = () => {
     //useEffect pour accéder aux tables réservées
     useEffect(() => {
         setIdTableSelected(idTableSelected)
+        
     }, [idTableSelected])
     useEffect(()=>{
         getAllTables()
-    }, [])
+    }, [idTableSelected, modalState])
     useEffect(() => {
         // Check to see if this is a redirect back from Checkout
         const query = new URLSearchParams(window.location.search)
